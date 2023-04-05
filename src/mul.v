@@ -11,13 +11,14 @@ module mul #(
 	output signed [IW+FW-1:0]		res
 );
 	
-	//reg signed [(IW+FW)*2-1:0] long_res;
-	reg signed [IW+FW-1:0] res_reg;
+	reg signed [(IW+FW)*2-1:0] long_res_reg;
+	//reg signed [IW+FW-1:0] res_reg;
 	
 	always@(posedge clk) begin
-		res_reg <= (fmap * wht) >>> (FW * 2);
+		long_res_reg <= fmap * wht;
 	end
-
-	assign res = res_reg;
+	
+	//disgard high 24 bits and low 8 bits.
+	assign res = long_res_reg >>> FW;
 
 endmodule

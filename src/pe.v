@@ -1,5 +1,5 @@
 /*
-	Input: 7 of feature map, 3 of weight
+	Input: 7 data of feature map, 3 of weight
 	Output: 9 MAC result
 
 	All feature maps and weights are 32 bits signed data, which is Q24.8. Datapath should be fix-point. 
@@ -84,4 +84,25 @@ module pe3x3 #(
 		res_regs[8] = MulRes_regs[6][0];
 	end
 	
+endmodule
+
+
+module pe1x1 #(
+	parameter INPUT_NUM = 7,
+	parameter OUTPUT_NUM = 9,
+	parameter WEIGHT_NUM = 1,
+	parameter IW = 24,
+	parameter FW = 8
+	)(
+	input 									clk,
+	input [INPUT_NUM*(IW+FW)-1:0]			fmap_i,
+	input [WEIGHT_NUM*(IW+FW)-1:0] 			wht_i,
+
+	output [OUTPUT_NUM*(IW+FW)-1:0] 		res_o
+);
+
+	wire [IW+FW-1:0] fmap_regs [0:INPUT_NUM-1];
+	wire [IW+FW-1:0] MulRes_regs [0:INPUT_NUM-1][0:WEIGHT_NUM-1];
+	reg [IW+FW-1:0] res_regs [0:OUTPUT_NUM-1];
+
 endmodule
