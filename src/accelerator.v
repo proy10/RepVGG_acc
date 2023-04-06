@@ -8,7 +8,7 @@
 
 	Design solution:
 	1. (Data Reuse)conv3*3 and conv1*1 use different module
-	Use 8 PEs for 3*3 conv. A PE is a 7*3 array, hence 8 PEs consist of 56*3 array. A 3*3 PE computes 3 weights and 7 data of feature map at a time, so this array can compute 1 column of kernel(3 weights) and 1 column of feature map(56 data) in one cycle. Take padding into consideration. As a result, it takes 3*(56-3+1)+4 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
+	Use 8 PEs for 3*3 conv. A PE is a 7*3 array, hence 8 PEs consist of 56*3 array. A 3*3 PE computes MAC of 3 weights and 7 data of feature map at a time, so this array can complete 1 column of kernel(3 weights) and 1 column of feature map(56 data) in one cycle. Take padding into consideration. As a result, it takes 3*(56-3+1)+4 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
 	Use 8 PEs for 1*1 conv. It takes 56 cycles for one channel.
 	2. (Module Reuse)conv3*3 and conv1*1 use the same module(VWA)
 	Use 8 general PEs, which can process both 3*3 conv and 1*1 conv.
