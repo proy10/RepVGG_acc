@@ -12,6 +12,6 @@ module mul #(
 
 	assign long_res = fmap * wht;
 	//disgard high 24 bits and low 8 bits.
-	assign res = long_res_reg >>> FW;
+	assign res = long_res >>> FW;
 
 endmodule

@@ -33,14 +33,14 @@ module pe3x3 #(
 	genvar m;
 	generate
 		for(m=0; m<INPUT_NUM; m=m+1) begin: read_fmap
-			assign fmap_regs[m] = fmap_i[m*(IW+FW)+IW+DW-1:m*(IW+FW)];
+			assign fmap_regs[m] = fmap_i[m*(IW+FW)+IW+FW-1:m*(IW+FW)];
 		end
 	endgenerate
 
 	genvar n;
 	generate
 		for(n=0; n<WEIGHT_NUM; n=n+1) begin: read_wht
-			assign wht_regs[n] = wht_i[n*(IW+FW)+IW+DW-1:n*(IW+FW)];
+			assign wht_regs[n] = wht_i[n*(IW+FW)+IW+FW-1:n*(IW+FW)];
 		end
 	endgenerate
 
@@ -49,11 +49,11 @@ module pe3x3 #(
 	generate
 		for(i=0; i<INPUT_NUM; i=i+1) begin: row
 			for (j=0; j<WEIGHT_NUM; j=j+1) begin: col
-				mul u_mul #(
+				mul #(
 					.IW(IW),
 					.FW(FW)
-					)(
-					//.clk(clk), 
+				) 
+				u_mul(
 					.fmap(fmap_regs[i]),
 					.wht(wht_regs[j]),
 					.res(MulRes_regs[i][j])
@@ -63,9 +63,9 @@ module pe3x3 #(
 	endgenerate
 
 	//compute partial sum
-	always@(posedge clk or negedge rst_n) begin
+	always@(posedge clk or negedge rst_n) begin 
 		if(!rst_n) begin
-			/*res_regs[0] = 0;
+			res_regs[0] = 0;
 			res_regs[1] = 0;
 			res_regs[2] = 0;
 			res_regs[3] = 0;
@@ -73,11 +73,11 @@ module pe3x3 #(
 			res_regs[5] = 0;
 			res_regs[6] = 0;
 			res_regs[7] = 0;
-			res_regs[8] = 0;*/
-			integer t;
+			res_regs[8] = 0;
+			/*integer t;
 			for(t=0; t<OUTPUT_NUM; t=t+1) begin: reset_regs
 				res_regs[t] = 0;
-			end
+			end*/
 		end
 		else if(!config) begin
 			res_regs[0] = MulRes_regs[0][2];
@@ -106,7 +106,7 @@ module pe3x3 #(
 	genvar k;
 	generate
 		for(k=0; k<OUTPUT_NUM; k=k+1) begin: write_res
-			assign res_o[k*(IW+FW)+IW+DW-1:k*(IW+FW)] = res_regs[k];
+			assign res_o[k*(IW+FW)+IW+FW-1:k*(IW+FW)] = res_regs[k];
 		end
 	endgenerate
 	
