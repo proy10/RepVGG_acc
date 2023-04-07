@@ -74,10 +74,6 @@ module pe3x3 #(
 			res_regs[6] = 0;
 			res_regs[7] = 0;
 			res_regs[8] = 0;
-			/*integer t;
-			for(t=0; t<OUTPUT_NUM; t=t+1) begin: reset_regs
-				res_regs[t] = 0;
-			end*/
 		end
 		else if(!config) begin
 			res_regs[0] = MulRes_regs[0][2];

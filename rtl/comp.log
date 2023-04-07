@@ -1,0 +1,421 @@
+
+Warning-[DBG_FLAG_DEP] Debug Option is being Deprecated
+  The '-fsdb' debug-related option is being deprecated and will no longer be 
+  supported in a future release.
+  Please recompile using the '-debug_access<+options>' switch and incremental 
+  options as required.  Recommended options are '-debug_access' for 
+  post-process debug, '-debug_access+classdbg' for testbench debug, and 
+  '-debug_access+all' for all debug capabilities.  Refer the VCS user guide 
+  for more granular options for debug control under the switch '-debug_access'
+  and refer to '-debug_region' for region control.
+
+Command: vcs -R -sverilog -j2 +v2k -timescale=1ns/1ns -fsdb +define+FSDB_ON -debug_pp \
+-P /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/novas.tab /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/pli.a \
+-Mupdate -l comp.log +acc +vpi +memcbk +notimingcheck /home/riscv/RepVGG_acc/rtl/pe_tb.v \
+/home/riscv/RepVGG_acc/rtl/pe3x3.v /home/riscv/RepVGG_acc/rtl/mul.v
+                         Chronologic VCS (TM)
+         Version L-2016.06_Full64 -- Fri Apr  7 21:08:32 2023
+               Copyright (c) 1991-2016 by Synopsys Inc.
+                         ALL RIGHTS RESERVED
+
+This program is proprietary and confidential information of Synopsys Inc.
+and may be used and disclosed only as authorized in a license agreement
+controlling such use and disclosure.
+
+
+Warning-[DBG_FLAG_DEP] Debug Option is being Deprecated
+  The '+acc' debug-related option is being deprecated and will no longer be 
+  supported in a future release.
+  Please recompile using the '-debug_access<+options>' switch and incremental 
+  options as required.  Recommended options are '-debug_access' for 
+  post-process debug, '-debug_access+classdbg' for testbench debug, and 
+  '-debug_access+all' for all debug capabilities.  Refer the VCS user guide 
+  for more granular options for debug control under the switch '-debug_access'
+  and refer to '-debug_region' for region control.
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpvars' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpvarsES' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMDA' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpSVA' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpvarsByFile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbSuppress' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpon' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpoff' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbSwitchDumpfile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpfile' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbAutoSwitchDumpfile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpFinish' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpflush' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbLog' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbAddRuntimeSignal' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpSC' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpvarsToFile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_create_transaction_stream' has multiple definitions 
+  in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_begin_transaction' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_end_transaction' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_free_transaction' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_add_attribute' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_update_label' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_add_relation' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbWhatif' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpClassMethod' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbSuppressClassMethod' has multiple definitions in PLI
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbSuppressClassProp' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMDAByFile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_create_stream_begin' has multiple definitions 
+  in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_define_attribute' has multiple definitions in 
+  PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_create_stream_end' has multiple definitions in
+  PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_begin' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_set_label' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_add_attribute' has multiple definitions in PLI
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_add_tag' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_end' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_add_relation' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_get_error_code' has multiple definitions in 
+  PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_add_stream_attribute' has multiple definitions
+  in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbTrans_add_scope_attribute' has multiple definitions 
+  in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_interactive' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_test' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpClassObject' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpClassObjectByFile' has multiple definitions in 
+  PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$ridbDump' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$sps_flush_file' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpPSL' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDisplay' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumplimit' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMem' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMemNow' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMemInScope' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMDANow' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMDAOnChange' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMDAInScope' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpMemInFile' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpPSLon' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpPSLoff' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpSVAon' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpSVAoff' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpStrength' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpSingle' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpIO' has multiple definitions in PLI table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbDumpPattern' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Warning-[UFTMD] User function/task multiply defined
+  The function/task '$fsdbSubstituteHier' has multiple definitions in PLI 
+  table(s).
+  
+
+
+Error-[SFCOR] Source file cannot be opened
+  Source file "/home/riscv/RepVGG_acc/rtl/pe_tb.v" cannot be opened for 
+  reading due to 'No such file or directory'.
+  Please fix above issue and compile again.
+  
+  
+
+67 warnings
+1 error
+CPU time: .113 seconds to compile

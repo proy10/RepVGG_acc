@@ -1,4 +1,4 @@
-INFO := "4.7 update testbench pe3x3"
+INFO := "4.7 update accelerate"
 
 
 all: add commit push

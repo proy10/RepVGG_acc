@@ -8,6 +8,7 @@ module pe1x1 #(
 	input 									rst_n,
 	input [INPUT_NUM*(IW+FW)-1:0]			fmap_i,
 	input [IW+FW-1:0] 						wht_i,
+	input									active,
 
 	output [OUTPUT_NUM*(IW+FW)-1:0] 		res_o
 );
@@ -36,11 +37,14 @@ module pe1x1 #(
 			);
 		end
 	endgenerate
-
+	
+	integer t;
 	always@(posedge clk or negedge rst_n) begin
-		integer t;
 		for(t=0; t<OUTPUT_NUM; t=t+1) begin: read_res
-			res_regs[t] <= MulRes_regs[t];
+			if(!active)
+				res_regs[t] <= 0;
+			else
+				res_regs[t] <= MulRes_regs[t];
 		end
 	end
 
