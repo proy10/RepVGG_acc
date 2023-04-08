@@ -1,4 +1,4 @@
-#plan
+# plan
 Implement a block of RepVGG. The implement of convolution layer can refer to "*VWA: Hardware Efficient Vectorwise Accelerator for Convolutional Neural Network*".  
 ### Hardware  
 tree adder; fix point multiplier;  
