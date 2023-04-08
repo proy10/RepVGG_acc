@@ -14,6 +14,7 @@
 	As a result, take padding into consideration, it takes 3*56-2 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
 
 	Use 8 PEs for 1*1 conv. It takes 56 cycles for one channel.
+
 	2. (Module Reuse)conv3*3 and conv1*1 use the same module(VWA)
 	Use 8 general PEs, which can process both 3*3 conv and 1*1 conv.
 

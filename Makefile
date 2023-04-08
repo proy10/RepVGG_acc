@@ -1,4 +1,4 @@
-INFO := "4.7 update accelerate"
+INFO := "4.8 update README"
 
 
 all: add commit push
