@@ -8,11 +8,11 @@
 
 	Design solution:
 	1. (Data Reuse)conv3*3 and conv1*1 use different module
-	Use 8 PEs for 3*3 conv. The PE is a 7*3 array, hence 8 PEs consist of a 56*3 array. A 3*3 PE computes MAC of 3 weights and 7 data of feature map at a time, so this array can complete 1 column of kernel(3 weights) and 1 column of feature map(56 data) in one cycle. 
+	Use 8 PEs for 3*3 conv. The PE is a 7*3 array, hence 8 PEs consist of a 56*3 array. A 3*3 PE computes MAC of 3 weights and 7 data of feature map at a time, so this array can complete 1 column of kernel(3 weights) and 1 column of feature map(56 data) in one cycle. We use 3 such array to parallel computing produre.
 
 	HOW TO DEAL PADDING?
 	Buffer1 stores the sum of product of the 2nd weight and the 1st feature and the product of 3rd weight and 2nd feature. It's equal to that the 1st weight multiplie zero, which is the padding. It's the same with Buffer7. 
-	As a result, take padding into consideration, it takes 3*56-2 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
+	As a result, take padding into consideration, it takes 56 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
 
 	Use 8 PEs for 1*1 conv. It takes 56 cycles for one channel.
 	
@@ -38,40 +38,56 @@ module accelerator #(
 	input			valid,
 
 	output			ready,
-	output [DW-1:0]	res_o
+	output [DW-1:0]	data_o
 );
 
-	sirv_sim_ram u_ram(
-		.clk(clk),
-		.din(),
-		.addr(),
-		.cs(),
-		.we(),
-		.wem(),
-		.dout()
+	
+
+	ser2par #(
+		.DW(DW),
+		.DEPTH(56)
+	)
+	fmap_s2p(
+		.clk(),
+		.rst_n(),
+		.data_i(),
+		.data_o()
+	);
+
+	ser2par #(
+		.DW(DW),
+		.DEPTH(10)
+	)
+	wht_s2p(
+		.clk(),
+		.rst_n(),
+		.data_i(),
+		.data_o()
 	);
 	
-	genvar i;
+	genvar i, j;
 	generate
 		for(i=0; i<PE_NUM; i=i+1) begin: PE_init
-			pe3x3 #(
-				.INPUT_NUM(7),
-				.OUTPUT_NUM(9),
-				.WEIGHT_NUM(3),
-				.IW(IW),
-				.FW(FW)
-			)
-			u_pe3x3(
-				.clk(clk),
-				.rst_n(rst_n),
-				.fmap_i(),
-				.wht_i(),
-				.array_i_0(),
-				.array_i_1(),
-				.config(),
+			for(j=0; j<3; j=j+1) begin: PE3x3_init
+				pe3x3 #(
+					.INPUT_NUM(7),
+					.OUTPUT_NUM(9),
+					.WEIGHT_NUM(3),
+					.IW(IW),
+					.FW(FW)
+				)
+				u_pe3x3(
+					.clk(clk),
+					.rst_n(rst_n),
+					.fmap_i(),
+					.wht_i(),
+					.array_i_0(),
+					.array_i_1(),
+					.config(),
 
-				.res_o()
-			);
+					.res_o()
+				);
+			end
 
 			pe1x1 #(
 				.INPUT_NUM(7),
@@ -90,4 +106,14 @@ module accelerator #(
 			);
 		end
 	endgenerate
+
+	sirv_sim_ram u_ram(
+		.clk(clk),
+		.din(),
+		.addr(),
+		.cs(),
+		.we(),
+		.wem(),
+		.dout()
+	);
 endmodule

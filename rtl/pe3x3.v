@@ -13,7 +13,7 @@ module pe3x3 #(
 	parameter WEIGHT_NUM = 3,
 	parameter IW = 24,
 	parameter FW = 8
-	)(
+)(
 	input 									clk,
 	input 									rst_n,
 	input [INPUT_NUM*(IW+FW)-1:0]			fmap_i,

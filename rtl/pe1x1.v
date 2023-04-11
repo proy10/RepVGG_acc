@@ -3,7 +3,7 @@ module pe1x1 #(
 	parameter OUTPUT_NUM = 7,
 	parameter IW = 24,
 	parameter FW = 8
-	)(
+)(
 	input 									clk,
 	input 									rst_n,
 	input [INPUT_NUM*(IW+FW)-1:0]			fmap_i,
@@ -27,10 +27,11 @@ module pe1x1 #(
 	genvar i;
 	generate
 		for(i=0; i<INPUT_NUM; i=i+1) begin: mul_inst
-			mul u_mul #(
+			mul #(
 				.IW(IW),
 				.FW(FW)
-				)( 
+			)
+			u_mul( 
 				.fmap(fmap_regs[i]),
 				.wht(wht_i),
 				.res(MulRes_regs[i])
@@ -38,15 +39,17 @@ module pe1x1 #(
 		end
 	endgenerate
 	
-	integer t;
-	always@(posedge clk or negedge rst_n) begin
+	genvar t;
+	generate
 		for(t=0; t<OUTPUT_NUM; t=t+1) begin: read_res
-			if(!active)
-				res_regs[t] <= 0;
-			else
-				res_regs[t] <= MulRes_regs[t];
+			always@(posedge clk or negedge rst_n) begin
+				if(!active)
+					res_regs[t] <= 0;
+				else
+					res_regs[t] <= MulRes_regs[t];
+			end
 		end
-	end
+	endgenerate
 
 	genvar k;
 	generate

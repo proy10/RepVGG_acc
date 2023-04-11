@@ -1,5 +1,3 @@
-INFO := "4.8 update README"
-
 
 all: add commit push
 		
