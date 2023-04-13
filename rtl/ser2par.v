@@ -1,23 +1,23 @@
 module ser2par #(
 	parameter DW = 32,
-	parameter DEPTH = 56
+	parameter DP = 56
 )(
 	input					clk,
 	input					rst_n,
 	input [DW-1:0]			data_i,
 	//input					sel, //0 denotes active
 	
-	output [DW*DEPTH-1:0]	data_o
+	output [DW*DP-1:0]	data_o
 );
 	
-	reg [DW*DEPTH-1:0] mem;
+	reg [DW*DP-1:0] mem;
 	reg [5:0] wr_ptr;
 	reg full;
 
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n) 
 			wr_ptr <= 0;
-		else if(wr_ptr == (DEPTH-1))
+		else if(wr_ptr == (DP-1))
 			wr_ptr <= 0;
 		else
 			wr_ptr <= wr_ptr + 1;
@@ -36,7 +36,7 @@ module ser2par #(
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			full = 1'b0;
-		else if(wr_ptr == (DEPTH-1))
+		else if(wr_ptr == (DP-1))
 			full = 1'b1;
 		else
 			full = 1'b0;

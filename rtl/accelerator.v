@@ -45,9 +45,8 @@ module accelerator #(
 
 	ser2par #(
 		.DW(DW),
-		.DEPTH(56)
-	)
-	fmap_s2p(
+		.DP(56)
+	) fmap_s2p(
 		.clk(),
 		.rst_n(),
 		.data_i(),
@@ -56,9 +55,8 @@ module accelerator #(
 
 	ser2par #(
 		.DW(DW),
-		.DEPTH(10)
-	)
-	wht_s2p(
+		.DP(10)
+	) wht_s2p(
 		.clk(),
 		.rst_n(),
 		.data_i(),
@@ -75,8 +73,7 @@ module accelerator #(
 					.WEIGHT_NUM(3),
 					.IW(IW),
 					.FW(FW)
-				)
-				u_pe3x3(
+				) u_pe3x3(
 					.clk(clk),
 					.rst_n(rst_n),
 					.fmap_i(),
@@ -94,8 +91,7 @@ module accelerator #(
 				.OUTPUT_NUM(9),
 				.IW(IW),
 				.FW(FW)
-			)
-			u_pe1x1(
+			) u_pe1x1(
 				.clk(clk),
 				.rst_n(rst_n),
 				.fmap_i(),
@@ -107,7 +103,12 @@ module accelerator #(
 		end
 	endgenerate
 
-	sirv_sim_ram u_ram(
+	
+
+	sirv_sim_ram #(
+		.DP(),
+		.DW()
+	) u_ram(
 		.clk(clk),
 		.din(),
 		.addr(),

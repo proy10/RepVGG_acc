@@ -52,8 +52,7 @@ module pe3x3 #(
 				mul #(
 					.IW(IW),
 					.FW(FW)
-				) 
-				u_mul(
+				) u_mul(
 					.fmap(fmap_regs[i]),
 					.wht(wht_regs[j]),
 					.res(MulRes_regs[i][j])
