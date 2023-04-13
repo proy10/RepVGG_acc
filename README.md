@@ -18,4 +18,4 @@ We use a reg of 9\*4B=36B to store 3\*3 kernel weights.
 ## 2. (Module Reuse)conv3\*3 and conv1*1 use the same module(VWA) 
 Use 8 general PEs, which can process both 3\*3 conv and 1\*1 conv.  
 
-# TEST
+
