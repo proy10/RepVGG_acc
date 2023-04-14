@@ -26,24 +26,26 @@
 */
 
 module accelerator #(
+	parameter HIT = 56,
+	parameter WHT_NUM = 10,
 	parameter DW = 32,
 	parameter PE_NUM = 8,
 	parameter IW = 24,
 	parameter FW = 8
 )(
-	input 			clk,
-	input			rst_n,
-	input [DW-1:0]	fmap_i,
-	input [DW-1:0]	wht,
-	input			valid,
+	input 							clk,
+	input							rst_n,
+	input [HIT*DW-1:0]				fmap_i,
+	input [WHT_NUM*DW-1:0]			wht,
+	input							valid,
 
-	output			ready,
-	output [DW-1:0]	data_o
+	output							ready,
+	output [HIT*DW-1:0]				data_o
 );
 
 	
 
-	ser2par #(
+	/*ser2par #(
 		.DW(DW),
 		.DP(56)
 	) fmap_s2p(
@@ -61,7 +63,7 @@ module accelerator #(
 		.rst_n(),
 		.data_i(),
 		.data_o()
-	);
+	);*/
 	
 	genvar i, j;
 	generate

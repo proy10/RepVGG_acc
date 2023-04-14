@@ -1,11 +1,16 @@
-module accumulator#(
+/*
+	function: partial accumulation for 3x3 conv
+	output: 56*32 bit
+*/
+
+module accumulator #(
 	parameter DW = 32,
 	parameter DP = 56,
-	parameter REG_NUM = 3
+	parameter CHNL_NUM = 3
 )(
 	input						clk,
 	input						rst_n,
-	input [REG_NUM*DW*DP-1:0]	data_i,
+	input [CHNL_NUM*DW*DP-1:0]	data_i,
 
 	output [DW*DP-1:0]			data_o
 );
