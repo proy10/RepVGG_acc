@@ -1,5 +1,5 @@
 /*
-	function: partial accumulation for 3x3 conv
+	function: partial accumulation for 3x3 conv and 1x1 conv
 	output: 56*32 bit
 */
 
@@ -11,6 +11,7 @@ module accumulator #(
 	input						clk,
 	input						rst_n,
 	input [CHNL_NUM*DW*DP-1:0]	data_i,
+	input [DW*DP-1:0]			conv_res, //sum of origin and 1x1 conv
 
 	output [DW*DP-1:0]			data_o
 );
@@ -43,7 +44,7 @@ module accumulator #(
 					s2_reg[n] <= 0;
 				end
 				else begin
-					s2_reg[n] <= s1_reg[n] + data_i[DW*(DP+n)+:DW];
+					s2_reg[n] <= s1_reg[n] + data_i[DW*(DP+n)+:DW] + conv_res;
 				end
 			end
 		end
