@@ -19,7 +19,7 @@ module chnl_acum #(
 );
 
 	reg [5:0] cnt, chnl_cnt;
-	reg [DW-1:0] mems [0:HIT-1][0:WID-1];
+	reg [DW*HIT*WID-1:0] shift_regs;
 
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
@@ -40,8 +40,16 @@ module chnl_acum #(
 				chnl_cnt <= 0;
 			else
 				chnl_cnt <= chnl_cnt + 1;
+		end
 	end
 
-	
+	always@(posedge clk or negedge rst_n) begin
+		if(!rst_n)
+			shift_regs <= 0;
+		else if(valid)
+			shift_regs <= {shift_regs[DW*HIT*WID-1:DW*HIT], shift_regs[DW*HIT*WID-1-:DW*HIT]} + {(DW*HIT*(WID-1)){1'b0}, data_i};
+	end
+
+	assign data_o = (chnl_cnt == 55) ? shift_regs[DW*HIT-1:0] : 0;
 
 endmodule
