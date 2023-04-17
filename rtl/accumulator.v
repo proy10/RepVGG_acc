@@ -71,7 +71,7 @@ module accumulator #(
 					s2_reg[i_c12c3_s2] <= 0;
 				end
 				else begin
-					s2_reg[i_c12c3_s2] <= s1_reg[i_c12c3_s2] + data_i_conv3[DW*(DP+i_c12c3_s2)+:DW] + data_i_conv1;
+					s2_reg[i_c12c3_s2] <= s1_reg[i_c12c3_s2] + data_i_conv3[DW*(DP+i_c12c3_s2)+:DW] + reg_ori2c1[i_c12c3_s2];
 				end
 			end
 		end
