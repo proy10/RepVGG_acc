@@ -5,16 +5,15 @@
 
 module accumulator #(
 	parameter DW = 32,
-	parameter DP = 56,
-	parameter CHNL_NUM = 3
+	parameter DP = 56
 )(
 	input						clk,
 	input						rst_n,
-	input [CHNL_NUM*DW*DP-1:0]	data_i_conv3,
+	input [3*DW*DP-1:0]			data_i_conv3,
 	input [DW*DP-1:0]			data_i_conv1,
 	input [DW*DP-1:0]			data_i_ori,
 
-	output [DW*DP-1:0]			data_o
+	output [DW*DP-1:0]			data_o,
 );
 
 	reg [DW-1:0] reg_ori [0:DP-1];

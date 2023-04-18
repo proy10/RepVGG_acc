@@ -45,10 +45,10 @@ module accelerator #(
 	output [HIT*DW-1:0]				data_o
 );
 	
+	//pe3x3 init
 	wire [3*DW-1:0] wht3x3 [0:2];
 	wire [DW-1:0] array_i [0:PE_NUM-1][0:2][0:1];
 	wire [OUTPUT_NUM*DW-1:0] res_3x3 [0:PE_NUM-1][0:2];
-	wire [OUTPUT_NUM*DW-1:0] res_1x1 [0:PE_NUM-1];
 
 	genvar i_wht;
 	generate
@@ -75,7 +75,6 @@ module accelerator #(
 		end
 	endgenerate
 
-	//pe3x3 init
 	genvar i_pe3, j_pe3;
 	generate
 		for(i_pe3=0; i_pe3<PE_NUM; i_pe3=i_pe3+1) begin: PE3x3
@@ -93,7 +92,7 @@ module accelerator #(
 					.wht_i(wht3x3[j_pe3]),
 					.array_i_0(array_i[i_pe3][j_pe3][0]),
 					.array_i_1(array_i[i_pe3][j_pe3][1]),
-					.config(1),
+					.config(1'b1),
 
 					.res_o(res_3x3[i_pe3][j_pe3])
 				);
@@ -102,35 +101,88 @@ module accelerator #(
 	endgenerate
 
 	//pe1x1 init
+	wire [(OUTPUT_NUM-2)*DW-1:0] res_1x1 [0:PE_NUM-1];
+
 	genvar i_pe1;
 	generate
 		for(i_pe1=0; i_pe1<PE_NUM; i_pe1=i_pe1+1) begin: PE1x1
 			pe1x1 #(
 				.INPUT_NUM(INPUT_NUM),
-				.OUTPUT_NUM(OUTPUT_NUM),
+				.OUTPUT_NUM(7),
 				.IW(IW),
 				.FW(FW)
 			) u_pe1x1(
 				.clk(clk),
 				.rst_n(rst_n),
 				.fmap_i(fmap_i[INPUT_NUM*DW*i_pe3+:INPUT_NUM*DW]),
-				.wht_i(wht_i[(i_pe1+9)*DW+:DW]),
+				.wht_i(wht_i[(WHT_NUM-1)*DW+:DW]),
 
 				.res_o(res_1x1[i_pe1])
 			);
 		end
 	endgenerate
 
-	sirv_sim_ram #(
-		.DP(),
-		.DW()
-	) u_ram(
+	//accumulator init
+	wire [DW*HIT-1:0] wire_i_conv1;
+	wire [3*DW*DP-1:0] wire_i_conv3;
+	wire [DW*HIT-1:0] wire_o_acc_res;
+
+	genvar i_conv1;
+	generate
+		for(i_conv1=0; i_conv1<PE_NUM; i_conv1=i_conv1+1) begin: wire_conv1
+			assign wire_i_conv1[i_conv1*(OUTPUT_NUM-2)*DW+:(OUTPUT_NUM-2)*DW] = res_1x1[i_conv1];
+		end
+	endgenerate
+
+	genvar i_conv3, j_conv3;
+	generate
+		for(i_conv3=0; i_conv3<3; i_conv3=i_conv3+1) begin: wire_conv3
+			for(j_conv3=0; j_conv3<PE_NUM; j_conv3=j_conv3+1) begin: wire_conv3_chnl
+				// discard high DW bits and low DW bits.
+				assign wire_i_conv3[(i_conv3+j_conv3)*(OUTPUT_NUM-2)*DW+:(OUTPUT_NUM-2)*DW] = res_3x3[j_conv3][i_conv3][(OUTPUT_NUM-1)*DW-1:DW];
+			end
+		end
+	endgenerate
+	
+	accumulator #(
+		.DW(DW),
+		.DP(HIT)
+	) u_acum(
 		.clk(clk),
-		.din(),
-		.addr(),
-		.cs(),
-		.we(),
-		.wem(),
-		.dout()
+		.rst_n(rst_n),
+		.data_i_conv3(wire_i_conv3),
+		.data_i_conv1(wire_i_conv1),
+		.data_i_ori(fmap_i),
+
+		.data_o(wire_o_accres)
 	);
+
+	//chnl_acum init
+	wire [DW*HIT-1:0] wire_o_ch_acc_res;
+	chnl_acum #(
+		.DW(DW),
+		.HIT(HIT),
+		.WID(WID)
+	) u_chac(
+		.clk(clk),
+		.rst_n(rst_n),
+		.data_i(wire_o_accres),
+		.valid(valid),
+
+		.data_o(wire_o_ch_acc_res)
+	);
+
+	//relu init
+	wire [DW*HIT-1:0] wire_o_relu_res;
+	relu #(
+		.DW(DW),
+		.DP(HIT)
+	) u_relu(
+		.clk(clk),
+		.rst_n(rst_n),
+		.data_i(wire_o_ch_acc_res),
+
+		.data_o(wire_o_relu_res)
+	);
+	
 endmodule

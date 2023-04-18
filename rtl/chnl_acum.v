@@ -20,11 +20,19 @@ module chnl_acum #(
 
 	reg [5:0] cnt, chnl_cnt;
 	reg [DW*HIT*WID-1:0] shift_regs;
+	reg [3:0] shift_valid;
+
+	always@(posedge clk or negedge rst_n) begin
+		if(!rst_n) 
+			shift_valid <= 4'b0;
+		else
+			shift_valid <= {shift_valid[2:0], valid};
+	end
 
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			cnt <= 0;
-		else if(valid) begin
+		else if(shift_valid[3]) begin
 			if(cnt == 55)
 				cnt <= 0;
 			else
@@ -46,7 +54,7 @@ module chnl_acum #(
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			shift_regs <= 0;
-		else if(valid)
+		else if(shift_valid[3])
 			shift_regs <= {shift_regs[DW*HIT*WID-1:DW*HIT], shift_regs[DW*HIT*WID-1-:DW*HIT]} + {(DW*HIT*(WID-1)){1'b0}, data_i};
 	end
 
