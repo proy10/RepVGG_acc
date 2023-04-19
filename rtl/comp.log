@@ -11,10 +11,12 @@ Warning-[DBG_FLAG_DEP] Debug Option is being Deprecated
 
 Command: vcs -R -sverilog -j2 +v2k -timescale=1ns/1ns -fsdb +define+FSDB_ON -debug_pp \
 -P /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/novas.tab /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/pli.a \
--Mupdate -l comp.log +acc +vpi +memcbk +notimingcheck /home/riscv/RepVGG_acc/rtl/pe_tb.v \
-/home/riscv/RepVGG_acc/rtl/pe3x3.v /home/riscv/RepVGG_acc/rtl/mul.v
+-Mupdate -l comp.log +acc +vpi +memcbk +notimingcheck /home/riscv/RepVGG_acc/rtl/accelerator.v \
+/home/riscv/RepVGG_acc/rtl/pe3x3.v /home/riscv/RepVGG_acc/rtl/mul.v /home/riscv/RepVGG_acc/rtl/pe1x1.v \
+/home/riscv/RepVGG_acc/rtl/accumulator.v /home/riscv/RepVGG_acc/rtl/chnl_acum.v /home/riscv/RepVGG_acc/rtl/relu.v \
+
                          Chronologic VCS (TM)
-         Version L-2016.06_Full64 -- Fri Apr  7 21:08:32 2023
+         Version L-2016.06_Full64 -- Wed Apr 19 14:46:50 2023
                Copyright (c) 1991-2016 by Synopsys Inc.
                          ALL RIGHTS RESERVED
 
@@ -408,14 +410,80 @@ Warning-[UFTMD] User function/task multiply defined
   table(s).
   
 
+Parsing design file '/home/riscv/RepVGG_acc/rtl/accelerator.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/pe3x3.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/mul.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/pe1x1.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/accumulator.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/chnl_acum.v'
+Parsing design file '/home/riscv/RepVGG_acc/rtl/relu.v'
+Top Level Modules:
+       accelerator
+TimeScale is 1 ns / 1 ns
 
-Error-[SFCOR] Source file cannot be opened
-  Source file "/home/riscv/RepVGG_acc/rtl/pe_tb.v" cannot be opened for 
-  reading due to 'No such file or directory'.
-  Please fix above issue and compile again.
-  
-  
+Warning-[PCWM-W] Port connection width mismatch
+/home/riscv/RepVGG_acc/rtl/accelerator.v, 151
+"accumulator #(DW, HIT) u_acum( .clk (clk),  .rst_n (rst_n),  .data_i_conv3 (wire_i_conv3),  .data_i_conv1 (wire_i_conv1),  .data_i_ori (fmap_i),  .data_o (wire_o_accres));"
+  The following 1-bit expression is connected to 1792-bit port "data_o" of 
+  module "accumulator", instance "u_acum".
+  Expression: wire_o_accres
+  	use +lint=PCWM for more details
 
-67 warnings
-1 error
-CPU time: .113 seconds to compile
+
+Warning-[PCWM-W] Port connection width mismatch
+/home/riscv/RepVGG_acc/rtl/accelerator.v, 167
+"chnl_acum #(DW, HIT, WID) u_chac( .clk (clk),  .rst_n (rst_n),  .data_i (wire_o_accres),  .valid (valid),  .data_o (wire_o_ch_acc_res));"
+  The following 1-bit expression is connected to 1792-bit port "data_i" of 
+  module "chnl_acum", instance "u_chac".
+  Expression: wire_o_accres
+  	use +lint=PCWM for more details
+
+
+Warning-[SIOB] Select index out of bounds
+/home/riscv/RepVGG_acc/rtl/relu.v, 21
+"data_i[(0 * DW)-:DW]"
+  The select index is out of declared bounds : [1791:0].
+  In module instance : u_relu 
+  In module : relu.
+
+Starting vcs inline pass...
+
+Note-[VCS_PARAL] Parallel code-gen enabled
+  VCS is running with parallel code generation(-j)...
+
+7 unique modules to generate
+7 modules and 0 UDP read. 
+	However, due to incremental compilation, only 6 modules need to be compiled. 
+recompiling module accelerator
+recompiling module pe3x3
+recompiling module mul
+recompiling module pe1x1
+recompiling module chnl_acum
+recompiling module relu
+All of 6 modules done
+make[1]: Entering directory '/home/riscv/RepVGG_acc/rtl/csrc'
+rm -f _csrc*.so pre_vcsobj_*.so share_vcsobj_*.so
+if [ -x ../simv ]; then chmod -x ../simv; fi
+g++  -o ../simv   -Wl,-rpath-link=./ -Wl,-rpath='$ORIGIN'/simv.daidir/ -Wl,-rpath=./simv.daidir/ \
+-Wl,-rpath='$ORIGIN'/simv.daidir//scsim.db.dir  -rdynamic   amcQwB.o objs/amcQw_d.o \
+_32051_archive_1.so _32053_archive_1.so _prev_archive_1.so  SIM_l.o       rmapats_mop.o \
+rmapats.o rmar.o  rmar_llvm_0_1.o rmar_llvm_0_0.o          /home/riscv/synopsys/vcs_2016.06/linux64/lib/libzerosoft_rt_stubs.so \
+/home/riscv/synopsys/vcs_2016.06/linux64/lib/libvirsim.so /home/riscv/synopsys/vcs_2016.06/linux64/lib/liberrorinf.so \
+/home/riscv/synopsys/vcs_2016.06/linux64/lib/libsnpsmalloc.so /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/pli.a \
+/home/riscv/synopsys/vcs_2016.06/linux64/lib/libvcsnew.so /home/riscv/synopsys/vcs_2016.06/linux64/lib/libsimprofile.so \
+/home/riscv/synopsys/vcs_2016.06/linux64/lib/libuclinative.so   -Wl,-whole-archive \
+/home/riscv/synopsys/vcs_2016.06/linux64/lib/libvcsucli.so -Wl,-no-whole-archive \
+_vcs_pli_stub_.o   /home/riscv/synopsys/vcs_2016.06/linux64/lib/vcs_save_restore_new.o \
+/home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/LINUX64/pli.a -ldl -lm  -lc -lpthread \
+-ldl 
+../simv up to date
+make[1]: Leaving directory '/home/riscv/RepVGG_acc/rtl/csrc'
+Command: ./simv +v2k +define+FSDB_ON -a comp.log +acc +memcbk +notimingcheck
+Chronologic VCS simulator copyright 1991-2016
+Contains Synopsys proprietary information.
+Compiler version L-2016.06_Full64; Runtime version L-2016.06_Full64;  Apr 19 14:46 2023
+           V C S   S i m u l a t i o n   R e p o r t 
+Time: 0 ns
+CPU Time:      0.100 seconds;       Data structure size:   0.4Mb
+Wed Apr 19 14:46:51 2023
+CPU time: .331 seconds to compile + .405 seconds to elab + .100 seconds to link + .188 seconds in simulation

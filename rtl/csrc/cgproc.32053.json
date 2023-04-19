@@ -1,0 +1,31 @@
+{
+    "Modules": {
+        "accelerator": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        }
+    },
+    "ObjArchives": [
+        {
+            "archive": "archive.1/_32053_archive_1.a",
+            "objects": [
+                [
+                    "h29sY_d.o",
+                    174001
+                ]
+            ],
+            "size": 174001
+        }
+    ],
+    "CompUnits": {
+        "h29sY_d": {
+            "bytes": 174001,
+            "mod": "accelerator",
+            "out": "h29sY_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32053_archive_1.a",
+            "checksum": 0
+        }
+    },
+    "reusePaths": {}
+}

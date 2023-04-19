@@ -19,7 +19,7 @@ module pe1x1 #(
 	genvar m;
 	generate
 		for(m=0; m<INPUT_NUM; m=m+1) begin: read_fmap
-			assign fmap_regs[m] = fmap_i[m*(IW+FW)+IW+DW-1:m*(IW+FW)];
+			assign fmap_regs[m] = fmap_i[m*(IW+FW)+IW+FW-1:m*(IW+FW)];
 		end
 	endgenerate
 
@@ -52,7 +52,7 @@ module pe1x1 #(
 	genvar k;
 	generate
 		for(k=0; k<OUTPUT_NUM; k=k+1) begin: write_res
-			assign res_o[k*(IW+FW)+IW+DW-1:k*(IW+FW)] = res_regs[k];
+			assign res_o[k*(IW+FW)+IW+FW-1:k*(IW+FW)] = res_regs[k];
 		end
 	endgenerate
 	

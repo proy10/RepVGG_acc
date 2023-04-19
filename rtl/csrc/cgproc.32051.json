@@ -1,0 +1,111 @@
+{
+    "Modules": {
+        "mul": {
+            "Compiled": "Yes",
+            "Compiled Times": 2
+        },
+        "pe3x3_0000": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "...MASTER...": {},
+        "relu_0000": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "std": {
+            "Compiled": "Yes",
+            "Compiled Times": 2
+        },
+        "pe1x1_0000": {
+            "Compiled": "Yes",
+            "Compiled Times": 1
+        },
+        "chnl_acum": {
+            "Compiled": "Yes",
+            "Compiled Times": 2
+        }
+    },
+    "ObjArchives": [
+        {
+            "archive": "archive.1/_32051_archive_1.a",
+            "objects": [
+                [
+                    "cfUDI_d.o",
+                    64798
+                ],
+                [
+                    "KZf9Z_d.o",
+                    31892
+                ],
+                [
+                    "GVwwK_d.o",
+                    19937
+                ],
+                [
+                    "MpLAm_d.o",
+                    38659
+                ],
+                [
+                    "vqBLs_d.o",
+                    11254
+                ]
+            ],
+            "size": 166540
+        }
+    ],
+    "CompUnits": {
+        "KZf9Z_d": {
+            "bytes": 31892,
+            "mod": "pe3x3_0000",
+            "out": "KZf9Z_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32051_archive_1.a",
+            "checksum": 0
+        },
+        "amcQw_d": {
+            "bytes": 8028,
+            "mod": "...MASTER...",
+            "out": "objs/amcQw_d.o",
+            "mode": 4,
+            "checksum": 0
+        },
+        "vqBLs_d": {
+            "bytes": 11254,
+            "mod": "mul",
+            "out": "vqBLs_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32051_archive_1.a",
+            "checksum": 0
+        },
+        "cfUDI_d": {
+            "bytes": 64798,
+            "mod": "relu_0000",
+            "out": "cfUDI_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32051_archive_1.a",
+            "checksum": 0
+        },
+        "GVwwK_d": {
+            "bytes": 19937,
+            "mod": "pe1x1_0000",
+            "out": "GVwwK_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32051_archive_1.a",
+            "checksum": 0
+        },
+        "MpLAm_d": {
+            "bytes": 38659,
+            "mod": "chnl_acum",
+            "out": "MpLAm_d.o",
+            "mode": 4,
+            "archive": "archive.1/_32051_archive_1.a",
+            "checksum": 0
+        }
+    },
+    "reusePaths": {
+        "reYIK_d": {
+            "icPath": "csrc"
+        }
+    }
+}

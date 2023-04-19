@@ -55,7 +55,7 @@ module chnl_acum #(
 		if(!rst_n)
 			shift_regs <= 0;
 		else if(shift_valid[3])
-			shift_regs <= {shift_regs[DW*HIT*WID-1:DW*HIT], shift_regs[DW*HIT*WID-1-:DW*HIT]} + {(DW*HIT*(WID-1)){1'b0}, data_i};
+			shift_regs <= {shift_regs[DW*HIT*(WID-1)-1:0], shift_regs[DW*HIT*WID-1-:DW*HIT]} + {{(DW*HIT*(WID-1)){1'b0}}, data_i};
 	end
 
 	assign data_o = (chnl_cnt == 55) ? shift_regs[DW*HIT-1:0] : 0;

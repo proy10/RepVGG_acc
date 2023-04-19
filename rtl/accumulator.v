@@ -13,7 +13,7 @@ module accumulator #(
 	input [DW*DP-1:0]			data_i_conv1,
 	input [DW*DP-1:0]			data_i_ori,
 
-	output [DW*DP-1:0]			data_o,
+	output [DW*DP-1:0]			data_o
 );
 
 	reg [DW-1:0] reg_ori [0:DP-1];
@@ -59,13 +59,14 @@ module accumulator #(
 					s1_reg[i_c12c3_s1] <= data_i_conv3[DW*i_c12c3_s1+:DW];
 				end
 			end
+		end
 	endgenerate
 
 	//s2
 	genvar i_c12c3_s2;
 	generate
 		for(i_c12c3_s2=0; i_c12c3_s2<DP; i_c12c3_s2=i_c12c3_s2+1) begin: s2
-			always(posedge clk or negedge rst_n) begin
+			always@(posedge clk or negedge rst_n) begin
 				if(!rst_n) begin
 					s2_reg[i_c12c3_s2] <= 0;
 				end
@@ -80,7 +81,7 @@ module accumulator #(
 	genvar i_c12c3_s3;
 	generate
 		for(i_c12c3_s3=0; i_c12c3_s3<DP; i_c12c3_s3=i_c12c3_s3+1) begin: s3
-			always(posedge clk or negedge rst_n) begin
+			always@(posedge clk or negedge rst_n) begin
 				if(!rst_n) begin
 					s3_reg[i_c12c3_s3] <= 0;
 				end

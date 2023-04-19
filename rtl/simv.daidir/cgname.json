@@ -1,0 +1,42 @@
+{
+    "std": [
+        "std",
+        "reYIK",
+        "module"
+    ],
+    "accelerator": [
+        "accelerator",
+        "h29sY",
+        "module"
+    ],
+    "...MASTER...": [
+        "SIM",
+        "amcQw",
+        "module"
+    ],
+    "mul": [
+        "mul",
+        "vqBLs",
+        "module"
+    ],
+    "pe3x3_0000": [
+        "pe3x3_0000",
+        "KZf9Z",
+        "module"
+    ],
+    "pe1x1_0000": [
+        "pe1x1_0000",
+        "GVwwK",
+        "module"
+    ],
+    "chnl_acum": [
+        "chnl_acum",
+        "MpLAm",
+        "module"
+    ],
+    "relu_0000": [
+        "relu_0000",
+        "cfUDI",
+        "module"
+    ]
+}

@@ -1,0 +1,146 @@
+0 
+53
++acc
++cli+1
++define+FSDB_ON
++itf+/home/riscv/synopsys/vcs_2016.06/linux64/lib/vcsdp.tab
++memcbk
++memcbk
++notimingcheck
++v2k
++vcsd
++vpi
++vpi
+-Mamsrun=
+-Masflags=
+-Mcc=gcc
+-Mcfl= -pipe -fPIC -O -I/home/riscv/synopsys/vcs_2016.06/include
+-Mcplusplus=g++
+-Mcrt0=
+-Mcrtn=
+-Mcsrc=
+-Mexternalobj=
+-Mldflags= -rdynamic
+-Mobjects= /home/riscv/synopsys/vcs_2016.06/linux64/lib/libvirsim.so /home/riscv/synopsys/vcs_2016.06/linux64/lib/liberrorinf.so /home/riscv/synopsys/vcs_2016.06/linux64/lib/libsnpsmalloc.so /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/pli.a
+-Mout=simv
+-Msaverestoreobj=/home/riscv/synopsys/vcs_2016.06/linux64/lib/vcs_save_restore_new.o
+-Msyslibs=/home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/LINUX64/pli.a -ldl -lm
+-Mupdate
+-Mvcsaceobjs=
+-Mxcflags= -pipe -fPIC -I/home/riscv/synopsys/vcs_2016.06/include
+-P
+-P
+-Xcbug=0x1
+-Xpiyushb1=0x80
+-Xvcs_run_simv=1
+-debug=1
+-fsdb
+-fsdb
+-gen_obj
+-j2
+-l
+-picarchive
+-sverilog
+-timescale=1ns/1ns
+/home/riscv/RepVGG_acc/rtl/accelerator.v
+/home/riscv/RepVGG_acc/rtl/accumulator.v
+/home/riscv/RepVGG_acc/rtl/chnl_acum.v
+/home/riscv/RepVGG_acc/rtl/mul.v
+/home/riscv/RepVGG_acc/rtl/pe1x1.v
+/home/riscv/RepVGG_acc/rtl/pe3x3.v
+/home/riscv/RepVGG_acc/rtl/relu.v
+/home/riscv/synopsys/vcs_2016.06/linux64/bin/vcs1
+/home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/LINUX64/verdi.tab
+/home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/novas.tab
+comp.log
+71
+sysc_uni_pwd=/home/riscv/RepVGG_acc/rtl
+XMODIFIERS=@im=ibus
+XDG_VTNR=7
+XDG_SESSION_TYPE=x11
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SESSION_ID=c2
+XDG_SESSION_DESKTOP=ubuntu
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+XDG_SEAT=seat0
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_MENU_PREFIX=gnome-
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/riscv
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop:/var/lib/snapd/desktop
+XDG_CURRENT_DESKTOP=Unity
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg
+XAUTHORITY=/home/riscv/.Xauthority
+VTE_VERSION=4205
+VMR_MODE_FLAG=32
+VERDI_HOME=/home/riscv/synopsys/verdi_2016.06-1
+VCS_TARGET_ARCH=amd64
+VCS_MX_HOME_INTERNAL=1
+VCS_LOG_FILE=comp.log
+VCS_HOME=/home/riscv/synopsys/vcs_2016.06
+VCS_DEPTH=0
+VCS_ARG_ADDED_FOR_TMP=1
+VCS_ARCH_OVERRIDE=linux
+VCS_ARCH=linux64
+UPSTART_SESSION=unix:abstract=/com/ubuntu/upstart-session/1000/1616
+UNAME=/bin/uname
+TOOL_HOME=/home/riscv/synopsys/vcs_2016.06/linux64
+SSH_AUTH_SOCK=/run/user/1000/keyring/ssh
+SESSION_MANAGER=local/ubuntu:@/tmp/.ICE-unix/1851,unix/ubuntu:/tmp/.ICE-unix/1851
+SESSIONTYPE=gnome-session
+SESSION=ubuntu
+SCRNAME=vcs
+SCRIPT_NAME=vcs
+QT_QPA_PLATFORMTHEME=appmenu-qt5
+QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+QT_IM_MODULE=ibus
+QT_ACCESSIBILITY=1
+QT4_IM_MODULE=xim
+OVA_UUM=0
+MFLAGS=
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+MAKE_TERMOUT=/dev/pts/1
+MAKE_TERMERR=/dev/pts/1
+MAKELEVEL=1
+MAKEFLAGS=
+LESSOPEN=| /usr/bin/lesspipe %s
+LESSCLOSE=/usr/bin/lesspipe %s %s
+LC_ALL=C
+JOB=dbus
+INSTANCE=
+IM_CONFIG_PHASE=1
+ICC_HOME=/home/riscv/synopsys/icc_vL-2016.03
+GTK_MODULES=gail:atk-bridge:unity-gtk-module
+GTK_IM_MODULE=ibus
+GTK2_MODULES=overlay-scrollbar
+GPG_AGENT_INFO=/home/riscv/.gnupg/S.gpg-agent:0:1
+GNOME_KEYRING_PID=
+GNOME_KEYRING_CONTROL=
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+GDM_LANG=en_US
+GDMSESSION=ubuntu
+FSDB_HOME=/home/riscv/synopsys/verdi_2016.06-1
+DESKTOP_SESSION=ubuntu
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+DC_HOME=/home/riscv/synopsys/syn_vl_2016.03
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-pIZgIp3LPP
+COMPIZ_CONFIG_PROFILE=ubuntu
+CLUTTER_IM_MODULE=xim
+0
+10
+1681807203 /home/riscv/RepVGG_acc/rtl/relu.v
+1681886529 /home/riscv/RepVGG_acc/rtl/chnl_acum.v
+1681886234 /home/riscv/RepVGG_acc/rtl/accumulator.v
+1681886155 /home/riscv/RepVGG_acc/rtl/pe1x1.v
+1680845302 /home/riscv/RepVGG_acc/rtl/mul.v
+1681195384 /home/riscv/RepVGG_acc/rtl/pe3x3.v
+1681886792 /home/riscv/RepVGG_acc/rtl/accelerator.v
+1464145466 /home/riscv/synopsys/vcs_2016.06/linux64/lib/vcsdp.tab
+1468145700 /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/novas.tab
+1468145700 /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/LINUX64/verdi.tab
+5
+0 
+1464147802 /home/riscv/synopsys/vcs_2016.06/linux64/lib/libvirsim.so
+1464147272 /home/riscv/synopsys/vcs_2016.06/linux64/lib/liberrorinf.so
+1464147248 /home/riscv/synopsys/vcs_2016.06/linux64/lib/libsnpsmalloc.so
+1468144468 /home/riscv/synopsys/verdi_2016.06-1/share/PLI/VCS/linux64/pli.a
+1681886811 simv.daidir

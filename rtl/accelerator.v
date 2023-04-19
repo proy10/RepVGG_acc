@@ -27,6 +27,7 @@
 
 module accelerator #(
 	parameter HIT = 56,
+	parameter WID = 56,
 	parameter WHT_NUM = 10,
 	parameter DW = 32,
 	parameter PE_NUM = 8,
@@ -114,7 +115,7 @@ module accelerator #(
 			) u_pe1x1(
 				.clk(clk),
 				.rst_n(rst_n),
-				.fmap_i(fmap_i[INPUT_NUM*DW*i_pe3+:INPUT_NUM*DW]),
+				.fmap_i(fmap_i[INPUT_NUM*DW*i_pe1+:INPUT_NUM*DW]),
 				.wht_i(wht_i[(WHT_NUM-1)*DW+:DW]),
 
 				.res_o(res_1x1[i_pe1])
@@ -124,7 +125,7 @@ module accelerator #(
 
 	//accumulator init
 	wire [DW*HIT-1:0] wire_i_conv1;
-	wire [3*DW*DP-1:0] wire_i_conv3;
+	wire [3*DW*HIT-1:0] wire_i_conv3;
 	wire [DW*HIT-1:0] wire_o_acc_res;
 
 	genvar i_conv1;
@@ -173,7 +174,7 @@ module accelerator #(
 	);
 
 	//relu init
-	wire [DW*HIT-1:0] wire_o_relu_res;
+	//wire [DW*HIT-1:0] wire_o_relu_res;
 	relu #(
 		.DW(DW),
 		.DP(HIT)
@@ -182,7 +183,7 @@ module accelerator #(
 		.rst_n(rst_n),
 		.data_i(wire_o_ch_acc_res),
 
-		.data_o(wire_o_relu_res)
+		.data_o(data_o)
 	);
 	
 endmodule
