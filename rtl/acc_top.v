@@ -25,7 +25,7 @@
 	We have several crucial modules: PE, accumulator, activator and controller.
 */
 
-module accelerator #(
+module acc_top #(
 	parameter HIT = 56,
 	parameter WID = 56,
 	parameter WHT_NUM = 10,
@@ -38,14 +38,45 @@ module accelerator #(
 )(
 	input 							clk,
 	input							rst_n,
-	input [HIT*DW-1:0]				fmap_i,
-	input [WHT_NUM*DW-1:0]			wht_i,
+	//input [HIT*DW-1:0]				fmap_i,
+	input [128-1:0]					fmap_ii,
+	//input [WHT_NUM*DW-1:0]			wht_i,
+	input [32-1:0]					wht_ii,
 	input							valid,
+	input							ren,
 
 	output							ready,
-	output [HIT*DW-1:0]				data_o
+	//output [HIT*DW-1:0]				data_o
+	output [64-1:0]					data_oo
 );
-	
+	wire [HIT*DW-1:0] fmap_i;
+	wire [WHT_NUM*DW-1:0] wht_i;
+	wire [HIT*DW-1:0] data_o;
+
+	//fmap s2p
+	ser2par #(
+		.DWI(128),
+		.DWO(56*32)
+	) u_s2p_f(
+		.clk(clk),
+		.rst_n(rst_n),
+		.en(valid),
+		.data_i(fmap_ii),
+		.data_o(fmap_i)
+	);
+
+	//wht s2p
+	ser2par #(
+		.DWI(32),
+		.DWO(10*32)
+	) u_s2p_w(
+		.clk(clk),
+		.rst_n(rst_n),
+		.en(valid),
+		.data_i(wht_ii),
+		.data_o(wht_i)
+	);
+
 	//pe3x3 init
 	wire [3*DW-1:0] wht3x3 [0:2];
 	wire [DW-1:0] array_i [0:PE_NUM-1][0:2][0:1];
@@ -184,6 +215,60 @@ module accelerator #(
 		.data_i(wire_o_ch_acc_res),
 
 		.data_o(data_o)
+	);
+
+	//p2s init
+	wire ready_o;
+	wire [8*32-1:0] dout_p2s;
+	wire stall;
+
+	par2ser #(
+		.DWI(56*32),
+		.DWO(8*32)
+	) u_p2s(
+		.clk(clk),
+		.rst_n(rst_n),
+		.din(data_o),
+		.valid(valid),
+		.ready(ready_o),
+		.wen(stall),
+		.dout(dout_p2s)
+	);
+	
+	assign ready = ~stall & valid;
+
+	//mems
+	reg [14-1:0] wr_ptr;
+	reg [16-1:0] rd_ptr;
+
+	always@(posedge clk or negedge rst_n) begin
+		if(!rst_n)
+			wr_ptr <= 14'b0;
+		else if(stall)
+			wr_ptr <= wr_ptr + 1;
+	end
+
+	always@(posedge clk or negedge rst_n) begin
+		if(!rst_n)
+			rd_ptr <= 16'b0;
+		else if(ren)
+			rd_ptr <= rd_ptr + 1;
+	end
+	
+	mems #(
+		.DWI(8*32),
+		.DWO(64),
+		.AWI(14),
+		.AWO(16)
+	) u_mems(
+		.clk(clk),
+		.wen(stall),
+		.wr_ptr(wr_ptr),
+		.din(dout_p2s),
+		.ren(ren),
+		.rd_ptr(rd_ptr),
+
+		.dout(data_o)
 	);
 	
 endmodule

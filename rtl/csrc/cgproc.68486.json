@@ -1,0 +1,167 @@
+{
+    "Modules": {
+        "std": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "par2ser": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "...MASTER...": {},
+        "relu_0000": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "pe3x3_0000": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "pe1x1_0000": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "chnl_acum": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "sirv_sim_ram_0000": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "mul": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        },
+        "mems_0000": {
+            "Compiled Times": 1,
+            "Compiled": "Yes"
+        }
+    },
+    "CompUnits": {
+        "amcQw_d": {
+            "mod": "...MASTER...",
+            "out": "objs/amcQw_d.o",
+            "bytes": 8312,
+            "mode": 4,
+            "checksum": 0
+        },
+        "MpLAm_d": {
+            "mod": "chnl_acum",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "MpLAm_d.o",
+            "bytes": 38659,
+            "mode": 4,
+            "checksum": 0
+        },
+        "cfUDI_d": {
+            "mod": "relu_0000",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "cfUDI_d.o",
+            "bytes": 64798,
+            "mode": 4,
+            "checksum": 0
+        },
+        "xambZ_d": {
+            "mod": "par2ser",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "xambZ_d.o",
+            "bytes": 14147,
+            "mode": 4,
+            "checksum": 0
+        },
+        "reYIK_d": {
+            "mod": "std",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "reYIK_d.o",
+            "bytes": 33858,
+            "mode": 4,
+            "checksum": 0
+        },
+        "j2qaC_d": {
+            "mod": "mems_0000",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "j2qaC_d.o",
+            "bytes": 12750,
+            "mode": 4,
+            "checksum": 0
+        },
+        "KZf9Z_d": {
+            "mod": "pe3x3_0000",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "KZf9Z_d.o",
+            "bytes": 31892,
+            "mode": 4,
+            "checksum": 0
+        },
+        "GVwwK_d": {
+            "mod": "pe1x1_0000",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "GVwwK_d.o",
+            "bytes": 19937,
+            "mode": 4,
+            "checksum": 0
+        },
+        "ZeJCj_d": {
+            "mod": "sirv_sim_ram_0000",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "ZeJCj_d.o",
+            "bytes": 17751,
+            "mode": 4,
+            "checksum": 0
+        },
+        "vqBLs_d": {
+            "mod": "mul",
+            "archive": "archive.0/_68486_archive_1.a",
+            "out": "vqBLs_d.o",
+            "bytes": 11254,
+            "mode": 4,
+            "checksum": 0
+        }
+    },
+    "reusePaths": {},
+    "ObjArchives": [
+        {
+            "archive": "archive.0/_68486_archive_1.a",
+            "objects": [
+                [
+                    "cfUDI_d.o",
+                    64798
+                ],
+                [
+                    "reYIK_d.o",
+                    33858
+                ],
+                [
+                    "KZf9Z_d.o",
+                    31892
+                ],
+                [
+                    "GVwwK_d.o",
+                    19937
+                ],
+                [
+                    "ZeJCj_d.o",
+                    17751
+                ],
+                [
+                    "j2qaC_d.o",
+                    12750
+                ],
+                [
+                    "MpLAm_d.o",
+                    38659
+                ],
+                [
+                    "xambZ_d.o",
+                    14147
+                ],
+                [
+                    "vqBLs_d.o",
+                    11254
+                ]
+            ],
+            "size": 245046
+        }
+    ]
+}
