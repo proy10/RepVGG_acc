@@ -1,274 +1,178 @@
-/*
-	Input feature map size: 56*56*64
-	Output feature size: 56*56*64
+module acc_top (
+	input				clk,
+	input				rst_n,
 
-	Analysis:
-	We need 128 conv kernel(64 3*3 kernel and 64 1*1 kernel), of which size is 3*3*64 and 1*1*64. 
-	We will do 56*56*64*64 times of 3*3 convolution operation and 56*56*64*64 times of 1*1 convolution operation.
+	input				i_icb_cmd_valid,
+	output				i_icb_cmd_ready,
+	input [32-1:0]			i_icb_cmd_addr,
+	input				i_icb_cmd_read,
+	input [32-1:0]			i_icb_cmd_wdata,
+	input [32/8-1:0]		i_icb_cmd_wmask,
 
-	Design solution:
-	1. (Data Reuse)conv3*3 and conv1*1 use different module
-	Use 8 PEs for 3*3 conv. The PE is a 7*3 array, hence 8 PEs consist of a 56*3 array. A 3*3 PE computes MAC of 3 weights and 7 data of feature map at a time, so this array can complete 1 column of kernel(3 weights) and 1 column of feature map(56 data) in one cycle. We use 3 such array to parallel computing produre.
-
-	HOW TO DEAL PADDING?
-	Buffer1 stores the sum of product of the 2nd weight and the 1st feature and the product of 3rd weight and 2nd feature. It's equal to that the 1st weight multiplie zero, which is the padding. It's the same with Buffer7. 
-	As a result, take padding into consideration, it takes 56 cycles for one channel of feature map to complete 3*3 conv(don't consider the cost for sum).
-
-	Use 8 PEs for 1*1 conv. It takes 56 cycles for one channel.
-	
-	We use a ser2par module and a par2ser module to process feature map input and output. For a ser2par module, its memory capacity is 56*4B=224B. 
-	We use a reg of 9*4B=36B to store 3*3 kernel weights.
-
-	2. (Module Reuse)conv3*3 and conv1*1 use the same module(VWA)
-	Use 8 general PEs, which can process both 3*3 conv and 1*1 conv.
-
-	We have several crucial modules: PE, accumulator, activator and controller.
-*/
-
-module acc_top #(
-	parameter HIT = 56,
-	parameter WID = 56,
-	parameter WHT_NUM = 10,
-	parameter DW = 32,
-	parameter PE_NUM = 8,
-	parameter INPUT_NUM = 7,
-	parameter OUTPUT_NUM = 9,
-	parameter IW = 24,
-	parameter FW = 8
-)(
-	input 							clk,
-	input							rst_n,
-	//input [HIT*DW-1:0]				fmap_i,
-	input [128-1:0]					fmap_ii,
-	//input [WHT_NUM*DW-1:0]			wht_i,
-	input [32-1:0]					wht_ii,
-	input							valid,
-	input							ren,
-
-	output							ready,
-	//output [HIT*DW-1:0]				data_o
-	output [64-1:0]					data_oo
+	output				i_icb_rsp_valid,
+	input				i_icb_rsp_ready,
+	output				i_icb_rsp_err,
+	output reg [32-1:0]		i_icb_rsp_rdata
 );
-	wire [HIT*DW-1:0] fmap_i;
-	wire [WHT_NUM*DW-1:0] wht_i;
-	wire [HIT*DW-1:0] data_o;
 
-	//fmap s2p
-	ser2par #(
-		.DWI(128),
-		.DWO(56*32)
-	) u_s2p_f(
-		.clk(clk),
-		.rst_n(rst_n),
-		.en(valid),
-		.data_i(fmap_ii),
-		.data_o(fmap_i)
-	);
+//Address range: 0x1010_0000 -- 0x101F_FFFF
+	localparam BASE_ADDR 		= 32'h1010_0000;
+	localparam CTRL_ADDR 		= 32'h1010_0004; //RW
+	localparam STATUS_ADDR 		= 32'h1010_1008; //R
+	localparam IFM_SRAM_ADDR	= 32'h1014_0000; //RW
+	localparam WHT_SRAM_ADDR	= 32'h1018_0000; //RW
+	localparam RESULT_SRAM_ADDR	= 32'h101C_0000; //R
 
-	//wht s2p
-	ser2par #(
-		.DWI(32),
-		.DWO(10*32)
-	) u_s2p_w(
-		.clk(clk),
-		.rst_n(rst_n),
-		.en(valid),
-		.data_i(wht_ii),
-		.data_o(wht_i)
-	);
 
-	//pe3x3 init
-	wire [3*DW-1:0] wht3x3 [0:2];
-	wire [DW-1:0] array_i [0:PE_NUM-1][0:2][0:1];
-	wire [OUTPUT_NUM*DW-1:0] res_3x3 [0:PE_NUM-1][0:2];
+//Interface
+	wire check_addr;
+	assign i_icb_cmd_ready = i_icb_rsp_ready & check_addr;
+	assign i_icb_rsp_valid = i_icb_cmd_valid & check_addr & i_icb_cmd_read;
+	assign check_addr = (i_icb_cmd_addr[31:20] == BASE_ADDR[31:20]);
 
-	genvar i_wht;
-	generate
-		for(i_wht=0; i_wht<3; i_wht=i_wht+1) begin: read_wht3x3
-			assign wht3x3[i_wht] = wht_i[i_wht*3*DW+:3*DW];
-		end
-	endgenerate
+	reg [32-1:0] i_icb_cmd_addr_reg;
+	reg i_icb_cmd_read_reg;
+	reg [32/8-1:0] i_icb_cmd_wmask_reg;
 
-	genvar j;
-	generate
-		for(j=0; j<3; j=j+1) begin: arr_init
-			assign array_i[0][j][0] = 32'b0;
-			assign array_i[0][j][1] = 32'b0;
-		end
-	endgenerate
-
-	genvar i_arr, j_arr;
-	generate
-		for(i_arr=1; i_arr<PE_NUM; i_arr=i_arr+1) begin: arr_i_pe
-			for(j_arr=0; j_arr<3; j_arr=j_arr+1) begin: arr_j_pe
-				assign array_i[i_arr][j_arr][0] = res_3x3[i_arr-1][j_arr][(OUTPUT_NUM-2)*DW+:DW];
-				assign array_i[i_arr][j_arr][1] = res_3x3[i_arr-1][j_arr][(OUTPUT_NUM-1)*DW+:DW];
-			end
-		end
-	endgenerate
-
-	genvar i_pe3, j_pe3;
-	generate
-		for(i_pe3=0; i_pe3<PE_NUM; i_pe3=i_pe3+1) begin: PE3x3
-			for(j_pe3=0; j_pe3<3; j_pe3=j_pe3+1) begin: chnl
-				pe3x3 #(
-					.INPUT_NUM(INPUT_NUM),
-					.OUTPUT_NUM(OUTPUT_NUM),
-					.WEIGHT_NUM(3),
-					.IW(IW),
-					.FW(FW)
-				) u_pe3x3(
-					.clk(clk),
-					.rst_n(rst_n),
-					.fmap_i(fmap_i[INPUT_NUM*DW*i_pe3+:INPUT_NUM*DW]),
-					.wht_i(wht3x3[j_pe3]),
-					.array_i_0(array_i[i_pe3][j_pe3][0]),
-					.array_i_1(array_i[i_pe3][j_pe3][1]),
-					.config(1'b1),
-
-					.res_o(res_3x3[i_pe3][j_pe3])
-				);
-			end
-		end
-	endgenerate
-
-	//pe1x1 init
-	wire [(OUTPUT_NUM-2)*DW-1:0] res_1x1 [0:PE_NUM-1];
-
-	genvar i_pe1;
-	generate
-		for(i_pe1=0; i_pe1<PE_NUM; i_pe1=i_pe1+1) begin: PE1x1
-			pe1x1 #(
-				.INPUT_NUM(INPUT_NUM),
-				.OUTPUT_NUM(7),
-				.IW(IW),
-				.FW(FW)
-			) u_pe1x1(
-				.clk(clk),
-				.rst_n(rst_n),
-				.fmap_i(fmap_i[INPUT_NUM*DW*i_pe1+:INPUT_NUM*DW]),
-				.wht_i(wht_i[(WHT_NUM-1)*DW+:DW]),
-
-				.res_o(res_1x1[i_pe1])
-			);
-		end
-	endgenerate
-
-	//accumulator init
-	wire [DW*HIT-1:0] wire_i_conv1;
-	wire [3*DW*HIT-1:0] wire_i_conv3;
-	wire [DW*HIT-1:0] wire_o_acc_res;
-
-	genvar i_conv1;
-	generate
-		for(i_conv1=0; i_conv1<PE_NUM; i_conv1=i_conv1+1) begin: wire_conv1
-			assign wire_i_conv1[i_conv1*(OUTPUT_NUM-2)*DW+:(OUTPUT_NUM-2)*DW] = res_1x1[i_conv1];
-		end
-	endgenerate
-
-	genvar i_conv3, j_conv3;
-	generate
-		for(i_conv3=0; i_conv3<3; i_conv3=i_conv3+1) begin: wire_conv3
-			for(j_conv3=0; j_conv3<PE_NUM; j_conv3=j_conv3+1) begin: wire_conv3_chnl
-				// discard high DW bits and low DW bits.
-				assign wire_i_conv3[(i_conv3+j_conv3)*(OUTPUT_NUM-2)*DW+:(OUTPUT_NUM-2)*DW] = res_3x3[j_conv3][i_conv3][(OUTPUT_NUM-1)*DW-1:DW];
-			end
-		end
-	endgenerate
-	
-	accumulator #(
-		.DW(DW),
-		.DP(HIT)
-	) u_acum(
-		.clk(clk),
-		.rst_n(rst_n),
-		.data_i_conv3(wire_i_conv3),
-		.data_i_conv1(wire_i_conv1),
-		.data_i_ori(fmap_i),
-
-		.data_o(wire_o_accres)
-	);
-
-	//chnl_acum init
-	wire [DW*HIT-1:0] wire_o_ch_acc_res;
-	chnl_acum #(
-		.DW(DW),
-		.HIT(HIT),
-		.WID(WID)
-	) u_chac(
-		.clk(clk),
-		.rst_n(rst_n),
-		.data_i(wire_o_accres),
-		.valid(valid),
-
-		.data_o(wire_o_ch_acc_res)
-	);
-
-	//relu init
-	//wire [DW*HIT-1:0] wire_o_relu_res;
-	relu #(
-		.DW(DW),
-		.DP(HIT)
-	) u_relu(
-		.clk(clk),
-		.rst_n(rst_n),
-		.data_i(wire_o_ch_acc_res),
-
-		.data_o(data_o)
-	);
-
-	//p2s init
-	wire ready_o;
-	wire [8*32-1:0] dout_p2s;
-	wire stall;
-
-	par2ser #(
-		.DWI(56*32),
-		.DWO(8*32)
-	) u_p2s(
-		.clk(clk),
-		.rst_n(rst_n),
-		.din(data_o),
-		.valid(valid),
-		.ready(ready_o),
-		.wen(stall),
-		.dout(dout_p2s)
-	);
-	
-	assign ready = ~stall & valid;
-
-	//mems
-	reg [14-1:0] wr_ptr;
-	reg [16-1:0] rd_ptr;
-
-	always@(posedge clk or negedge rst_n) begin
-		if(!rst_n)
-			wr_ptr <= 14'b0;
-		else if(stall)
-			wr_ptr <= wr_ptr + 1;
+	always@(posedge clk) begin
+		i_icb_cmd_addr_reg <= i_icb_cmd_addr;
+		i_icb_cmd_read_reg <= i_icb_cmd_read;
+		i_icb_cmd_wmask_reg <= i_icb_cmd_wmask;
 	end
 
-	always@(posedge clk or negedge rst_n) begin
-		if(!rst_n)
-			rd_ptr <= 16'b0;
-		else if(ren)
-			rd_ptr <= rd_ptr + 1;
-	end
-	
-	mems #(
-		.DWI(8*32),
-		.DWO(64),
-		.AWI(14),
-		.AWO(16)
-	) u_mems(
-		.clk(clk),
-		.wen(stall),
-		.wr_ptr(wr_ptr),
-		.din(dout_p2s),
-		.ren(ren),
-		.rd_ptr(rd_ptr),
+	//write
+	reg [32-1:0] ctrl;
+	reg [32-1:0] status;
+	reg [32-1:0] ifm_wdata;
+	reg [32-1:0] icb_wht_wdata;
+	reg icb_ifm_we, icb_wht_we, icb_ifm_cs, icb_wht_cs;
 
-		.dout(data_o)
-	);
+	always@(posedge clk or negedge rst_n) begin
+		if(!rst_n) begin
+			ctrl <= 32'h0;
+			status <= 32'h0;
+		end
+		else begin
+			icb_ifm_we <= 1'b0;
+			icb_wht_we <= 1'b0;
+			icb_ifm_cs <= 1'b0;
+			icb_wht_cs <= 1'b0;
+			if(i_icb_cmd_valid & i_icb_cmd_ready & ~i_icb_cmd_read) begin
+				if(i_icb_cmd_addr == CTRL_ADDR)
+					ctrl <= i_icb_cmd_wdata;
+				else if((i_icb_cmd_addr >= IFM_SRAM_ADDR) & (i_icb_cmd_addr < WHT_SRAM_ADDR)) begin
+					ifm_wdata <= i_icb_cmd_wdata;
+					icb_ifm_we <= 1'b1;
+					icb_ifm_cs <= 1'b1;
+				end
+				else if((i_icb_cmd_addr >= WHT_SRAM_ADDR) & (i_icb_cmd_addr < RESULT_SRAM_ADDR)) begin
+					icb_wht_wdata <= i_icb_cmd_wdata;
+					icb_wht_we <= 1'b1;
+					icb_wht_cs <= 1'b1;
+				end
+			end
+		end
+	end
+
+	//read
+	wire [32-1:0] res_rdata;
+	reg [32-1:0] rdata;
+	reg ren;
+	always@(posedge clk or negedge rst_n) begin
+		ren <= 1'b0;
+		if(i_icb_cmd_valid & i_icb_cmd_ready & i_icb_cmd_read)
+			if(i_icb_cmd_addr == CTRL_ADDR)
+				rdata <= ctrl;
+			else if(i_icb_cmd_addr == STATUS_ADDR)
+				rdata <= status;
+			else if(i_icb_cmd_addr >= RESULT_SRAM_ADDR) begin
+				rdata <= res_rdata;
+				ren <= 1'b1;
+			end
+	end
+
+	always(*) begin
+		if(i_icb_rsp_valid & i_icb_rsp_ready)
+			i_icb_rsp_rdata = rdata;
+		else
+			i_icb_rsp_rdata = 32'hx;
+	end
+
+//input feature map ram init
+	wire [32-1:0] ifm_ram_din_wire, ifm_ram_dout_wire, ifm_ram_addr_wire;
+	wire ifm_ram_we_wire, ifm_ram_cs_wire;
+	wire [32/8-1:0] ifm_ram_wem_wire;
+	wire ifm_ram_sel;
 	
+	assign ifm_ram_sel = ~i_icb_cmd_read & conv_ifm_we;
+	assign ifm_ram_din_wire = icb_ifm_wdata;
+	assign ifm_ram_addr_wire = (ifm_ram_sel) ? conv_ifm_addr : i_icb_cmd_addr_reg;
+	assign ifm_ram_cs_wire = (ifm_ram_sel) ? conv_ifm_cs : icb_ifm_cs;
+	assign ifm_ram_we_wire = (ifm_ram_sel) ? conv_ifm_we : ~i_icb_cmd_read_reg;
+	assign ifm_ram_wem_wire = (ifm_ram_sel) ? conv_ifm_wem : i_icb_cmd_wmask_reg;
+
+	sirv_sim_ram #(
+		.DP(8192),
+		.DW(32),
+		.MW(32/8)
+	) u_ifm_ram(
+		.clk(clk),
+		.din(ifm_ram_din_wire),
+		.addr(ifm_ram_addr_wire),
+		.cs(ifm_ram_cs_wire),
+		.we(ifm_ram_we_wire),
+		.wem(ifm_ram_wem_wire),
+		.dout(ifm_ram_dout_wire)
+	);
+
+//weight ram init
+	wire [32-1:0] wht_ram_din_wire, wht_ram_dout_wire, wht_ram_addr_wire;
+	wire wht_ram_we_wire, wht_ram_cs_wire;
+	wire [32/8-1:0] wht_ram_wem_wire;
+	wire wht_ram_sel;
+	
+	assign wht_ram_sel = ~i_icb_cmd_read & conv_wht_we;
+	assign wht_ram_din_wire = icb_wht_wdata;
+	assign wht_ram_addr_wire = (wht_ram_sel) ? conv_wht_addr : i_icb_cmd_addr_reg;
+	assign wht_ram_cs_wire = (wht_ram_sel) ? conv_wht_cs : icb_wht_cs;
+	assign wht_ram_we_wire = (wht_ram_sel) ? conv_wht_we : ~i_icb_cmd_read_reg;
+	assign wht_ram_wem_wire = (wht_ram_sel) ? conv_wht_wem : i_icb_cmd_wmask_reg;
+
+	sirv_sim_ram #(
+		.DP(8192),
+		.DW(32),
+		.MW(32/8)
+	) u_wht_ram(
+		.clk(clk),
+		.din(wht_ram_din_wire),
+		.addr(wht_ram_addr_wire),
+		.cs(wht_ram_cs_wire),
+		.we(wht_ram_we_wire),
+		.wem(wht_ram_wem_wire),
+		.dout(wht_ram_dout_wire)
+	);
+
+//result ram init
+	sirv_sim_ram #(
+		.DP(8192),
+		.DW(32),
+		.MW(32/8)
+	) u_res_ram(
+		.clk(clk),
+		.din(),
+		.addr(),
+		.cs(),
+		.we(),
+		.wem(),
+		.dout()
+	);
+
+//conv core
+	wire conv_wht_we;
+	conv_core u_core(
+		.clk(clk),
+		.rst_n(rst_n),
+		.
+	);
+
 endmodule
