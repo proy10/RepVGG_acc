@@ -9,4 +9,4 @@ commit:
 		git commit -m ${INFO}
 
 push:
-		git push origin main
+		git push origin icb

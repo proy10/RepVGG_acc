@@ -1,21 +1,24 @@
-module ser2par (
+module ser2par #(
+	parameter DWI = 4*8,
+	parameter DWO = 14*8
+)(
 	input			clk,
 	input			rst_n,
 	input			en,
-	input [32-1:0]		din,
+	input [DWI-1:0]		din,
 
-	output [56*16-1:0]	dout
+	output [DWO-1:0]	dout
 );
 
-	reg [56*16-1:0] shift_reg;
+	reg [DWO-1:0] shift;
 
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
-			shift_reg <= 0;
+			shift <= 0;
 		else if(en)
-			shift_reg <= {shift_reg[55*16-1:0], 8{din[7]}, din};
+			shift <= {shift[DWO-DWI-1:0], din};
 	end
 
-	assign dout = (en) ? 0 : shift_reg;
+	assign dout = shift;
 
 endmodule
