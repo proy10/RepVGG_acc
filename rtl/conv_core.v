@@ -1,25 +1,25 @@
 module conv_core (
 	input 			clk,
 	input 			rst_n,
-	input [32-1:0]		ctrl,
+	//input [32-1:0]		ctrl,
 	input [32-1:0]		state,
 
 	output [32-1:0]		ifm_addr,
 	output			ifm_cs,
 	output			ifm_we,
-	output [32/8-1]		ifm_wem,
+	output [32/8-1:0]	ifm_wem,
 	input [32-1:0]		ifm_i,
 
 	output [32-1:0]		wht_addr,
 	output			wht_cs,
 	output			wht_we,
-	output [32/8-1]		wht_wem,
+	output [32/8-1:0]	wht_wem,
 	input [32-1:0]		wht_i,
 
 	output [32-1:0]		res_addr,
 	output reg		res_cs,
 	output reg		res_we,
-	output [32/8-1]		res_wem,
+	output [32/8-1:0]	res_wem,
 	output [32-1:0]		res_o
 );
 
@@ -33,8 +33,8 @@ module conv_core (
 	//assign ifm_exp = {{8{ifm_i[31]}}, ifm_i[31-:8], {8{ifm_i[23]}}, ifm_i[23-:8], {8{ifm_i[15]}}, ifm_i[15-:8], {8{ifm_i[7]}}, ifm_i[7-:8]};
 	
 	ser2par #(
-		.DWI(4*8),
-		.DWO(14*8)
+		.DWI(32),
+		.DWO(112)
 	) u_s2p_ifm (
 		.clk(clk),
 		.rst_n(rst_n),
@@ -61,14 +61,14 @@ module conv_core (
 //wht serial to parallel
 	wire wht_en;
 	//wire [4*16-1:0] wht_exp;
-	wire [6*8-1:0] wht;
+	wire [48-1:0] wht;
 
 	assign wht_en = state[5];
 	//assign wht_exp = {{8{wht_i[31]}}, wht_i[31-:8], {8{wht_i[23]}}, wht_i[23-:8], {8{wht_i[15]}}, wht_i[15-:8], {8{wht_i[7]}}, wht_i[7-:8]};
 	
 	ser2par #(
-		.DWI(4*8),
-		.DWO(6*8)
+		.DWI(32),
+		.DWO(48)
 	) u_s2p_wht(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -104,17 +104,16 @@ module conv_core (
 			pe u_pe(
 				.clk(clk),
 				.rst_n(rst_n),
-				.type(1'b0),
 				.en(pe_en[pe_i]),
-				.ifm_i(ifm[pe_i*7*16+:7*16]),
-				.wht_i(wht[pe_i*3*16+:3*16]),
+				.ifm_i(ifm[pe_i*7*8+:7*8]),
+				.wht_i(wht[pe_i*3*8+:3*8]),
 				.res_o(pe_res[pe_i*9*32+:9*32])
 			);
 		end
 	endgenerate
 
 //pa init
-	wire pa_en;
+	wire [1:0] pa_en;
 	wire [18*32-1:0] pa_res;
 
 	assign pa_en = state[7:6];
@@ -123,13 +122,13 @@ module conv_core (
 	generate
 		for(pa_i=0; pa_i<2; pa_i=pa_i+1) begin: u_pa
 			part_adder #(
-				.DW(9*32)
+				.DW(288)
 			) u_pa(
 				.clk(clk),
 				.rst_n(rst_n),
 				.en(pa_en[pa_i]),
-				.din(pe_res[pe_i*9*32+:9*32]),
-				.dout(pa_res[pe_i*9*32+:9*32])
+				.din(pe_res[pa_i*9*32+:9*32]),
+				.dout(pa_res[pa_i*9*32+:9*32])
 			);
 		end
 	endgenerate
@@ -141,8 +140,8 @@ module conv_core (
 	assign ba_en = state[8];
 
 	block_adder #(
-		.DWI(18*32),
-		.DWO(9*32)
+		.DWI(576),
+		.DWO(288)
 	) u_ba(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -153,12 +152,13 @@ module conv_core (
 
 //ca init
 	wire ca_en;
-	wire [9*32-1:0] ca_res;
+	wire [224-1:0] ca_res;
 
 	assign ca_en = state[9];
 
 	chnl_adder #(
-		.DW(9*32)
+		.DWI(288),
+		.DWO(224)
 	) u_ca(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -169,12 +169,12 @@ module conv_core (
 
 //relu init
 	wire relu_en;
-	wire [9*32-1:0] relu_res;
+	wire [224-1:0] relu_res;
 
 	assign relu_en = state[10];
 
 	relu #(
-		.DW(9*32)
+		.DW(224)
 	) u_relu(
 		.clk(clk),
 		.rst_n(rst_n),
@@ -190,7 +190,7 @@ module conv_core (
 	assign p2s_ren = state[12];
 
 	par2ser #(
-		.DWI(9*32),
+		.DWI(224),
 		.DWO(32)
 	) u_p2s(
 		.clk(clk),
@@ -219,7 +219,7 @@ module conv_core (
 			res_cs <= 1'b0;
 			res_we <= 1'b0;
 		end
-		if(state[12]) begin
+		else if(state[12]) begin
 			res_cs <= state[12];
 			res_we <= state[12];
 		end

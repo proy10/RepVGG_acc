@@ -1,6 +1,6 @@
 module chnl_adder #(
-	parameter DWI = 9*32,
-	parameter DWO = 7*32
+	parameter DWI = 288,
+	parameter DWO = 224
 )(
 	input 			clk,
 	input 			rst_n,
@@ -14,12 +14,12 @@ module chnl_adder #(
 
 	integer i;
 	always@(posedge clk or negedge rst_n) begin
-		for(i=0; i<7; i=i+1) begin: cadder
-			if(!rst_n)
+		if(!rst_n)
+			for(i=0; i<7; i=i+1)
 				accum[i*32+:32] <= {32{1'b0}};
-			else if(en)
-				accum[i*32+:32] = accum[i*32+:32] + din[(i*32+32)+:32];
-		end
+		else if(en)
+			for(i=0; i<7; i=i+1)
+				accum[i*32+:32] <= accum[i*32+:32] + din[(i*32+32)+:32];
 	end
 
 	assign dout = accum;

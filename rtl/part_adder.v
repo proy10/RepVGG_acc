@@ -1,5 +1,5 @@
 module part_adder #(
-	parameter DW = 9*32
+	parameter DW = 288
 )(
 	input 			clk,
 	input 			rst_n,
@@ -13,12 +13,12 @@ module part_adder #(
 
 	integer i;
 	always@(posedge clk or negedge rst_n) begin
-		for(i=0; i<7; i=i+1) begin: padder
-			if(!rst_n)
+		if(!rst_n)
+			for(i=0; i<7; i=i+1)
 				accum[i*32+:32] <= {32{1'b0}};
-			else if(en)
-				accum[i*32+:32] = accum[i*32+:32] + din[i*32+:32];
-		end
+		else if(en)
+			for(i=0; i<7; i=i+1)
+				accum[i*32+:32] <= accum[i*32+:32] + din[i*32+:32];
 	end
 
 	assign dout = accum;

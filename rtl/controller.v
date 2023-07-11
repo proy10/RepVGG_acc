@@ -25,6 +25,14 @@ module controller(
 
 	wire start;
 	reg [32-1:0] next_state, state;
+	wire en;
+	reg [32-1:0] flag;
+	reg [32-1:0] cnt;
+	reg [32-1:0] conv_col;
+	reg [32-1:0] out;
+	reg [32-1:0] channel;
+	reg [32-1:0] col;
+
 	assign start = ctrl[0];
 	always@(*) begin
 		case(state)
@@ -52,7 +60,6 @@ module controller(
 		endcase
 	end
 
-	wire en;
 	assign en = ctrl[2];
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
@@ -80,7 +87,6 @@ module controller(
 		endcase
 	end
 
-	reg [32-1:0] flag;
 	always@(*) begin
 		case(state)
 			EN: flag = 2-1;
@@ -89,17 +95,17 @@ module controller(
 		endcase
 	end
 
-	reg [32-1:0] cnt;
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			cnt <= 32'h0;
-		else if(cnt==flag)
-			cnt <= 32'h0
-		else if(en)
-			cnt <= cnt + 1;
+		else if(state==EN || state==ROVER) begin
+			if(cnt==flag)
+				cnt <= 32'h0;
+			else
+				cnt <= cnt + 1;
+		end
 	end
 
-	reg [32-1] conv_col;
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			conv_col <= 0;
@@ -111,7 +117,6 @@ module controller(
 		end
 	end
 
-	reg [32-1] channel;
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			channel <= 0;
@@ -123,7 +128,6 @@ module controller(
 		end
 	end
 
-	reg [32-1] out;
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			out <= 0;
@@ -135,7 +139,6 @@ module controller(
 		end
 	end
 
-	reg [32-1] col;
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n)
 			col <= 0;

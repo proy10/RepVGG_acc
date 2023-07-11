@@ -1,6 +1,6 @@
 module ser2par #(
-	parameter DWI = 4*8,
-	parameter DWO = 14*8
+	parameter DWI = 32,
+	parameter DWO = 112
 )(
 	input			clk,
 	input			rst_n,

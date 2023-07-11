@@ -1,5 +1,5 @@
 module par2ser #(
-	parameter DWI = 7*32,
+	parameter DWI = 224,
 	parameter DWO = 32
 )(
 	input			clk,

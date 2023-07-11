@@ -1,4 +1,4 @@
-set CLK_PERIOD  1
+set CLK_PERIOD  2.65
 
 create_clock -period $CLK_PERIOD [get_ports clk]
 

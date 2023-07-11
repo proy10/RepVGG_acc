@@ -1,6 +1,6 @@
 module block_adder #(
-	parameter DWI = 18*32,
-	parameter DWO = 9*32
+	parameter DWI = 576,
+	parameter DWO = 288
 )(
 	input 			clk,
 	input 			rst_n,
@@ -10,7 +10,7 @@ module block_adder #(
 	output reg [DWO-1:0]	dout
 );
 
-	wire [DW-1:0] sum;
+	wire [DWO-1:0] sum;
 	
 	genvar i;
 	generate 

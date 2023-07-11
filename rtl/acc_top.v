@@ -26,11 +26,36 @@ module acc_top (
 
 //Interface
 	wire check_addr;
-	assign check_addr = (i_icb_cmd_addr[31:20] == BASE_ADDR[31:20]);
-	assign i_icb_cmd_ready = i_icb_rsp_ready & check_addr;
-
+	reg [32-1:0] ctrl;
+	wire [32-1:0] status;
+	reg [32-1:0] icb_ifm_wdata;
+	reg [32-1:0] icb_wht_wdata;
+	reg icb_ifm_we, icb_wht_we, icb_ifm_cs, icb_wht_cs;
 	reg [32-1:0] i_icb_cmd_addr_reg;
 	reg [32/8-1:0] i_icb_cmd_wmask_reg;
+	wire [32-1:0] res_rdata;
+	reg [32-1:0] rdata;
+	reg icb_res_ren;
+	wire [32-1:0] ctrl_wire;
+	wire [32-1:0] conv_ifm_addr, conv_wht_addr, conv_res_addr;
+	wire conv_ifm_cs, conv_wht_cs, conv_res_cs, conv_ifm_we, conv_wht_we, conv_res_we;
+	wire [32/8-1:0] conv_ifm_wem, conv_wht_wem, conv_res_wem;
+	wire [32-1:0] ifm_conv_rdata, wht_conv_rdata, conv_res_wdata;
+	wire [32-1:0] ifm_ram_din_wire, ifm_ram_dout_wire, ifm_ram_addr_wire;
+	wire ifm_ram_we_wire, ifm_ram_cs_wire;
+	wire [32/8-1:0] ifm_ram_wem_wire;
+	wire ifm_ram_sel;
+	wire [32-1:0] wht_ram_din_wire, wht_ram_dout_wire, wht_ram_addr_wire;
+	wire wht_ram_we_wire, wht_ram_cs_wire;
+	wire [32/8-1:0] wht_ram_wem_wire;
+	wire wht_ram_sel;
+	wire [32-1:0] res_ram_din_wire, res_ram_dout_wire, res_ram_addr_wire;
+	wire res_ram_we_wire, res_ram_cs_wire;
+	wire [32/8-1:0] res_ram_wem_wire;
+	wire res_ram_sel;
+
+	assign check_addr = (i_icb_cmd_addr[31:20] == BASE_ADDR[31:20]);
+	assign i_icb_cmd_ready = i_icb_rsp_ready & check_addr;
 
 	always@(posedge clk) begin
 		i_icb_cmd_addr_reg <= i_icb_cmd_addr;
@@ -38,11 +63,6 @@ module acc_top (
 	end
 
 	//write
-	reg [32-1:0] ctrl;
-	wire [32-1:0] status;
-	reg [32-1:0] icb_ifm_wdata;
-	reg [32-1:0] icb_wht_wdata;
-	reg icb_ifm_we, icb_wht_we, icb_ifm_cs, icb_wht_cs;
 
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n) begin
@@ -80,14 +100,15 @@ module acc_top (
 			i_icb_rsp_valid <= i_icb_cmd_valid & check_addr & i_icb_cmd_read;
 	end
 
-	wire [32-1:0] res_rdata;
 	assign res_rdata = res_ram_dout_wire;
 
-	reg [32-1:0] rdata;
-	reg icb_res_ren;
 	always@(posedge clk or negedge rst_n) begin
-		icb_res_ren <= 1'b0;
-		if(i_icb_cmd_valid & i_icb_cmd_ready & i_icb_cmd_read)
+		if(!rst_n) begin
+			icb_res_ren <= 1'b0;
+			rdata <= 32'h0;
+		end
+		else if(i_icb_cmd_valid & i_icb_cmd_ready & i_icb_cmd_read) begin
+			icb_res_ren <= 1'b0;
 			if(i_icb_cmd_addr == CTRL_ADDR)
 				rdata <= ctrl;
 			else if(i_icb_cmd_addr == STATUS_ADDR)
@@ -96,9 +117,10 @@ module acc_top (
 				rdata <= res_rdata;
 				icb_res_ren <= 1'b1;
 			end
+		end
 	end
 
-	always(*) begin
+	always@(*) begin
 		if(i_icb_rsp_valid & i_icb_rsp_ready)
 			i_icb_rsp_rdata = rdata;
 		else
@@ -106,7 +128,6 @@ module acc_top (
 	end
 
 //ctrl init
-	wire [32-1:0] ctrl_wire;
 	assign ctrl_wire = ctrl;
 
 	controller u_ctrl(
@@ -117,10 +138,6 @@ module acc_top (
 	);
 
 //conv core
-	wire [32-1:0] conv_ifm_addr, conv_wht_addr, conv_res_addr;
-	wire conv_ifm_cs, conv_wht_cs, conv_res_cs, conv_ifm_we, conv_wht_we, conv_res_we;
-	wire [32/8-1:0] conv_ifm_wem, conv_wht_wem, conv_res_wem;
-	wire [32-1:0] ifm_conv_rdata, wht_conv_rdata, conv_res_wdata;
 	
 	assign ifm_conv_rdata = ifm_ram_dout_wire;
 	assign wht_conv_rdata = wht_ram_dout_wire;
@@ -147,10 +164,6 @@ module acc_top (
 	);
 
 //input feature map ram init
-	wire [32-1:0] ifm_ram_din_wire, ifm_ram_dout_wire, ifm_ram_addr_wire;
-	wire ifm_ram_we_wire, ifm_ram_cs_wire;
-	wire [32/8-1:0] ifm_ram_wem_wire;
-	wire ifm_ram_sel;
 	
 	assign ifm_ram_sel = ~icb_ifm_we & conv_ifm_we;
 	assign ifm_ram_din_wire = icb_ifm_wdata;
@@ -159,7 +172,7 @@ module acc_top (
 	assign ifm_ram_we_wire = (ifm_ram_sel) ? conv_ifm_we : icb_ifm_we;
 	assign ifm_ram_wem_wire = (ifm_ram_sel) ? conv_ifm_wem : i_icb_cmd_wmask_reg;
 
-	sirv_sim_ram #(
+	/*sirv_sim_ram #(
 		.DP(8192),
 		.DW(32),
 		.MW(32/8)
@@ -171,13 +184,24 @@ module acc_top (
 		.we(ifm_ram_we_wire),
 		.wem(ifm_ram_wem_wire),
 		.dout(ifm_ram_dout_wire)
+	);*/
+
+	sram_top #(
+		.DW(32),
+		.MW(4),
+		.AW(32)
+	) u_ifm_ram(
+		.clk(clk),
+		.rst(rst_n),
+		.din(ifm_ram_din_wire),
+		.addr(ifm_ram_addr_wire),
+		.cs(ifm_ram_cs_wire),
+		.we(ifm_ram_we_wire),
+		.wem(ifm_ram_wem_wire),
+		.dout(ifm_ram_dout_wire)
 	);
 
 //weight ram init
-	wire [32-1:0] wht_ram_din_wire, wht_ram_dout_wire, wht_ram_addr_wire;
-	wire wht_ram_we_wire, wht_ram_cs_wire;
-	wire [32/8-1:0] wht_ram_wem_wire;
-	wire wht_ram_sel;
 	
 	assign wht_ram_sel = ~icb_wht_we & conv_wht_we;
 	assign wht_ram_din_wire = icb_wht_wdata;
@@ -186,7 +210,7 @@ module acc_top (
 	assign wht_ram_we_wire = (wht_ram_sel) ? conv_wht_we : icb_wht_we;
 	assign wht_ram_wem_wire = (wht_ram_sel) ? conv_wht_wem : i_icb_cmd_wmask_reg;
 
-	sirv_sim_ram #(
+	/*sirv_sim_ram #(
 		.DP(8192),
 		.DW(32),
 		.MW(32/8)
@@ -198,13 +222,24 @@ module acc_top (
 		.we(wht_ram_we_wire),
 		.wem(wht_ram_wem_wire),
 		.dout(wht_ram_dout_wire)
+	);*/
+
+	sram_top #(
+		.DW(32),
+		.MW(4),
+		.AW(32)
+	) u_wht_ram(
+		.clk(clk),
+		.rst(rst_n),
+		.din(wht_ram_din_wire),
+		.addr(wht_ram_addr_wire),
+		.cs(wht_ram_cs_wire),
+		.we(wht_ram_we_wire),
+		.wem(wht_ram_wem_wire),
+		.dout(wht_ram_dout_wire)
 	);
 
 //result ram init
-	wire [32-1:0] res_ram_din_wire, res_ram_dout_wire, res_ram_addr_wire;
-	wire res_ram_we_wire, res_ram_cs_wire;
-	wire [32/8-1:0] res_ram_wem_wire;
-	wire res_ram_sel;
 
 	assign res_ram_sel = ~icb_res_ren & conv_res_we;
 	assign res_ram_din_wire = conv_res_wdata;
@@ -213,12 +248,27 @@ module acc_top (
 	assign res_ram_we_wire = (res_ram_sel) ? conv_res_we : ~icb_res_ren;
 	assign res_ram_wem_wire = (res_ram_sel) ? conv_res_wem : 4'hf;
 
-	sirv_sim_ram #(
+	/*sirv_sim_ram #(
 		.DP(8192),
 		.DW(32),
 		.MW(32/8)
 	) u_res_ram(
 		.clk(clk),
+		.din(res_ram_din_wire),
+		.addr(conv_res_addr),
+		.cs(res_ram_cs_wire),
+		.we(res_ram_we_wire),
+		.wem(res_ram_wem_wire),
+		.dout(res_ram_dout_wire)
+	);*/
+
+	sram_top #(
+		.DW(32),
+		.MW(4),
+		.AW(32)
+	) u_res_ram(
+		.clk(clk),
+		.rst(rst_n),
 		.din(res_ram_din_wire),
 		.addr(conv_res_addr),
 		.cs(res_ram_cs_wire),
