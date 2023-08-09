@@ -49,7 +49,7 @@ module cla #(
 
     genvar j;
     generate
-        for(j=0; j<DW; j=j+1) begin: sum
+        for(j=0; j<DW; j=j+1) begin: cla_sum
             assign sum[j] = op1[j] ^ op2[j] ^ C[j];
         end
     endgenerate
@@ -74,12 +74,13 @@ module wallace_mul #(
         end
     endgenerate
 
-    wire [DWO-1] signed_exp_intermediate [0:DWI-1];
+    wire [DWO-1:0] signed_exp_intermediate [0:DWI-1];
     
     genvar i_exp;
     generate
         for(i_exp=0; i_exp<DWI; i_exp=i_exp+1) begin: expand
-            assign signed_exp_intermediate[i_exp] = {8{intermediate[i_exp][DWI-1]}, intermediate[i_exp]};
+            // assign signed_exp_intermediate[i_exp] = {{8{intermediate[i_exp][DWI-1]}}, intermediate[i_exp]};
+            assign signed_exp_intermediate[i_exp] = {{8{1'b0}}, intermediate[i_exp]} << i_exp;
         end
     endgenerate
 
@@ -90,22 +91,27 @@ module wallace_mul #(
 
     // level 1, 6 row to 4 row
     wire [DWO-1:0] level_1_out_sum [0:1], level_1_out_cout [0:1];
-    cas #(16) cas_level_1_0(.op1(level_0_out_sum[0]), .op2(level_0_out_cout[0]<<1), .op3(signed_exp_intermediate[6]), .sum(level_1_out_sum[0]), .cout(level_1_out_cout[0]));
-    cas #(16) cas_level_1_1(.op1(level_0_out_sum[1]), .op2(level_0_out_cout[1]<<1), .op3(signed_exp_intermediate[7]), .sum(level_1_out_sum[1]), .cout(level_1_out_cout[1]));
+    csa #(16) cas_level_1_0(.op1(level_0_out_sum[0]), .op2(level_0_out_cout[0]<<1), .op3(signed_exp_intermediate[6]), .sum(level_1_out_sum[0]), .cout(level_1_out_cout[0]));
+    csa #(16) cas_level_1_1(.op1(level_0_out_sum[1]), .op2(level_0_out_cout[1]<<1), .op3(signed_exp_intermediate[7]), .sum(level_1_out_sum[1]), .cout(level_1_out_cout[1]));
 
     // level 2, 4 row to 3 row
     wire [DWO-1:0] level_2_out_sum, level_2_out_cout;
-    cas #(16) cas_level_2_0(.op1(level_1_out_sum[0]), .op2(level_1_out_cout[0]<<1), .op3(level_1_out_sum[1]), .sum(level_2_out_sum), .cout(level_2_out_cout));
+    csa #(16) cas_level_2_0(.op1(level_1_out_sum[0]), .op2(level_1_out_cout[0]<<1), .op3(level_1_out_sum[1]), .sum(level_2_out_sum), .cout(level_2_out_cout));
 
     // level 3, 3 row to 2 row
     wire [DWO-1:0] level_3_out_sum, level_3_out_cout;
-    cas #(16) cas_level_2_0(.op1(level_2_out_sum), .op2(level_2_out_cout), .op3(level_1_out_cout[1]<<1), .sum(level_3_out_sum), .cout(level_3_out_cout));
+    csa #(16) cas_level_3_0(.op1(level_2_out_sum), .op2(level_2_out_cout<<1), .op3(level_1_out_cout[1]<<1), .sum(level_3_out_sum), .cout(level_3_out_cout));
 
     // level 4
     wire [3:0] cout;
-    cla #(4) cla_0(.op1(level_3_out_sum[3:0]), .op2((level_3_out_cout<<1)[3:0]), .cin(1'b0), .sum(out[3:0]), .cout(cout[0]));
-    cla #(4) cla_0(.op1(level_3_out_sum[7:4]), .op2((level_3_out_cout<<1)[7:4]), .cin(cout[0]), .sum(out[7:4]), .cout(cout[1]));
-    cla #(4) cla_0(.op1(level_3_out_sum[11:8]), .op2((level_3_out_cout<<1)[11:8]), .cin(cout[1]), .sum(out[11:8]), .cout(cout[2]));
-    cla #(4) cla_0(.op1(level_3_out_sum[15:12]), .op2((level_3_out_cout<<1)[15:12]), .cin(cout[2]), .sum(out[15:12]), .cout(cout[3]));
+    wire [DWO-1:0] cla_op2;
+    assign cla_op2 = level_3_out_cout<<1;
+    wire vss;
+    assign vss = 1'b0;
+
+    cla #(4) cla_0(.op1(level_3_out_sum[3:0]), .op2(cla_op2[3:0]), .cin(vss), .sum(out[3:0]), .cout(cout[0]));
+    cla #(4) cla_1(.op1(level_3_out_sum[7:4]), .op2(cla_op2[7:4]), .cin(cout[0]), .sum(out[7:4]), .cout(cout[1]));
+    cla #(4) cla_2(.op1(level_3_out_sum[11:8]), .op2(cla_op2[11:8]), .cin(cout[1]), .sum(out[11:8]), .cout(cout[2]));
+    cla #(4) cla_3(.op1(level_3_out_sum[15:12]), .op2(cla_op2[15:12]), .cin(cout[2]), .sum(out[15:12]), .cout(cout[3]));
 
 endmodule
