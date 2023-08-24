@@ -16,9 +16,15 @@ module acc_top (
 );
 
 //Address range: 0x1010_0000 -- 0x101F_FFFF
-	localparam BASE_ADDR 		= 32'h1010_0000;
+	localparam BASE_ADDR 		= 32'h1010_0000; //Inst reg
 	localparam CTRL_ADDR 		= 32'h1010_0004; //RW
 	localparam STATUS_ADDR 		= 32'h1010_1008; //R
+	localparam IFM_WIDTH_ADDR	= 32'h1010_100C; //RW
+	localparam IFM_HEIGHT_ADDR	= 32'h1010_1010; //RW
+	localparam IFM_DEPTH_ADDR	= 32'h1010_1014; //RW
+	localparam WHT_WIDTH_ADDR	= 32'h1010_1018; //RW
+	localparam WHT_HEIGHT_ADDR	= 32'h1010_101C; //RW
+	localparam WHT_DEPTH_ADDR	= 32'h1010_1020; //RW
 	localparam IFM_SRAM_ADDR	= 32'h1014_0000; //RW
 	localparam WHT_SRAM_ADDR	= 32'h1018_0000; //RW
 	localparam RESULT_SRAM_ADDR	= 32'h101C_0000; //R
@@ -63,7 +69,6 @@ module acc_top (
 	end
 
 	//write
-
 	always@(posedge clk or negedge rst_n) begin
 		if(!rst_n) begin
 			ctrl <= 32'h0;
